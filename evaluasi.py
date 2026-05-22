@@ -5,11 +5,10 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("Agg")
-from model import ModelTFIDF, ModelBM25
+from model import ModelTFIDF
 
 # ============================================================
 # 10 QUERY PENGUJIAN + GROUND TRUTH
-# Disesuaikan dengan dataset 183 film
 # ============================================================
 
 QUERY_GROUND_TRUTH = [
@@ -62,8 +61,7 @@ QUERY_GROUND_TRUTH = [
             "Don't Breathe 2", "Abigail",
             "반도", "Annabelle Comes Home",
             "Halloween Ends", "Ouija: Origin of Evil",
-            "Zombieland: Double Tap", "Lembayung",
-            "Old",
+            "Zombieland: Double Tap", "Lembayung", "Old",
         ]
     },
     {
@@ -101,8 +99,7 @@ QUERY_GROUND_TRUTH = [
             "Snake Eyes: G.I. Joe Origins",
             "Johnny English Strikes Again",
             "Johnny English Reborn",
-            "Hitman's Wife's Bodyguard",
-            "Mile 22",
+            "Hitman's Wife's Bodyguard", "Mile 22",
         ]
     },
     {
@@ -119,8 +116,7 @@ QUERY_GROUND_TRUTH = [
             "65", "Valerian and the City of a Thousand Planets",
             "The Predator", "The Adam Project",
             "Men in Black", "Men in Black II", "Men in Black 3",
-            "RoboCop", "Cloud Atlas",
-            "Wifelike", "원더랜드",
+            "RoboCop", "Cloud Atlas", "Wifelike", "원더랜드",
         ]
     },
     {
@@ -130,10 +126,8 @@ QUERY_GROUND_TRUTH = [
             "Basic Instinct", "Old Boy", "Sinister",
             "The Others", "Enola Holmes", "Inferno",
             "Molly's Game", "The Accountant",
-            "Searching", "Mindcage",
-            "Old", "Twelve Monkeys",
-            "The Devil All the Time",
-            "Dogville",
+            "Searching", "Mindcage", "Old", "Twelve Monkeys",
+            "The Devil All the Time", "Dogville",
         ]
     },
     {
@@ -146,10 +140,8 @@ QUERY_GROUND_TRUTH = [
             "Jumanji: The Next Level",
             "Hacksaw Ridge", "Logan", "Fall", "65",
             "Alpha", "Love and Monsters",
-            "The 13th Warrior",
-            "Thirteen Lives",
-            "Those Who Wish Me Dead",
-            "Escape from Pretoria",
+            "The 13th Warrior", "Thirteen Lives",
+            "Those Who Wish Me Dead", "Escape from Pretoria",
         ]
     },
     {
@@ -162,19 +154,14 @@ QUERY_GROUND_TRUTH = [
             "Fast & Furious Presents: Hobbs & Shaw",
             "Hitman's Wife's Bodyguard",
             "Ghostbusters: Frozen Empire",
-            "Sonic the Hedgehog 2",
-            "The Adam Project",
+            "Sonic the Hedgehog 2", "The Adam Project",
             "To All the Boys I've Loved Before",
-            "Crazy Rich Asians",
-            "Tom & Jerry", "Hustle",
+            "Crazy Rich Asians", "Tom & Jerry", "Hustle",
             "The Unbearable Weight of Massive Talent",
-            "Bridget Jones's Baby",
-            "Kung Fu Yoga",
-            "Johnny English Strikes Again",
-            "Johnny English Reborn",
+            "Bridget Jones's Baby", "Kung Fu Yoga",
+            "Johnny English Strikes Again", "Johnny English Reborn",
             "Dora and the Lost City of Gold",
             "The Banshees of Inisherin",
-            "賭俠 III 之上海灘賭聖",
         ]
     },
     {
@@ -184,18 +171,12 @@ QUERY_GROUND_TRUTH = [
             "Notting Hill", "Culpa Mía: London",
             "Bermain dengan Cinta",
             "The Twilight Saga: Eclipse",
-            "Corpse Bride",
-            "The Greatest Showman",
-            "Soul", "12 Angry Men",
-            "Maleficent",
+            "Corpse Bride", "The Greatest Showman",
+            "Soul", "12 Angry Men", "Maleficent",
             "To All the Boys I've Loved Before",
-            "Crazy Rich Asians",
-            "A Star Is Born",
-            "Rocketman",
-            "Bridget Jones's Baby",
-            "Werk ohne Autor",
-            "딸의 친구",
-            "Drive My Car",
+            "Crazy Rich Asians", "A Star Is Born",
+            "Rocketman", "Bridget Jones's Baby",
+            "Werk ohne Autor", "딸의 친구", "Drive My Car",
         ]
     },
 ]
@@ -207,30 +188,26 @@ QUERY_GROUND_TRUTH = [
 def cek_relevan(judul_hasil, ground_truth):
     judul_lower = judul_hasil.lower().strip()
     for gt in ground_truth:
-        gt_lower = gt.lower().strip()
-        if gt_lower in judul_lower or judul_lower in gt_lower:
+        if gt.lower().strip() in judul_lower or judul_lower in gt.lower().strip():
             return True
     return False
 
 def precision_at_k(hasil, ground_truth, k):
     if not hasil or not ground_truth:
         return 0.0
-    top_k   = hasil[:k]
-    relevan = sum(1 for h in top_k if cek_relevan(h["judul"], ground_truth))
+    relevan = sum(1 for h in hasil[:k] if cek_relevan(h["judul"], ground_truth))
     return relevan / k
 
 def recall_at_k(hasil, ground_truth, k):
     if not hasil or not ground_truth:
         return 0.0
-    top_k   = hasil[:k]
-    relevan = sum(1 for h in top_k if cek_relevan(h["judul"], ground_truth))
+    relevan = sum(1 for h in hasil[:k] if cek_relevan(h["judul"], ground_truth))
     return relevan / len(ground_truth)
 
 def average_precision(hasil, ground_truth):
     if not hasil or not ground_truth:
         return 0.0
-    total_ap = 0.0
-    hit      = 0
+    total_ap, hit = 0.0, 0
     for i, h in enumerate(hasil, 1):
         if cek_relevan(h["judul"], ground_truth):
             hit      += 1
@@ -240,10 +217,8 @@ def average_precision(hasil, ground_truth):
 def ndcg_at_k(hasil, ground_truth, k):
     if not hasil or not ground_truth:
         return 0.0
-    dcg = 0.0
-    for i, h in enumerate(hasil[:k], 1):
-        rel  = 1 if cek_relevan(h["judul"], ground_truth) else 0
-        dcg += rel / np.log2(i + 1)
+    dcg   = sum((1 / np.log2(i + 1)) for i, h in enumerate(hasil[:k], 1)
+                if cek_relevan(h["judul"], ground_truth))
     ideal = sum(1 / np.log2(i + 1) for i in range(1, min(len(ground_truth), k) + 1))
     return dcg / ideal if ideal > 0 else 0.0
 
@@ -251,13 +226,12 @@ def ndcg_at_k(hasil, ground_truth, k):
 # JALANKAN EVALUASI
 # ============================================================
 
-def evaluasi_model(model, nama_model, k=5):
+def evaluasi_model(model, k=5):
     print(f"\n{'=' * 60}")
-    print(f"📊 Evaluasi Model: {nama_model}")
+    print("📊 Evaluasi Model: TF-IDF + Cosine Similarity")
     print(f"{'=' * 60}")
 
     hasil_per_query = []
-
     for item in QUERY_GROUND_TRUTH:
         query  = item["query"]
         gt     = item["relevan"]
@@ -273,13 +247,13 @@ def evaluasi_model(model, nama_model, k=5):
             "query"         : query,
             "precision_at_k": round(p_at_k, 4),
             "recall_at_k"   : round(r_at_k, 4),
-            "ap"            : round(ap, 4),
-            "ndcg_at_k"     : round(ndcg, 4),
+            "ap"            : round(ap,     4),
+            "ndcg_at_k"     : round(ndcg,   4),
         })
 
         top3 = ", ".join([h["judul"] for h in hasil[:3]]) if hasil else "(tidak ada)"
-        print(f"\n  Q{item['no']}  : {query}")
-        print(f"  Top-3   : {top3}")
+        print(f"\n  Q{item['no']:02d} : {query}")
+        print(f"  Top-3  : {top3}")
         print(f"  P@{k}: {p_at_k:.4f} | R@{k}: {r_at_k:.4f} | AP: {ap:.4f} | NDCG@{k}: {ndcg:.4f}")
 
     df_eval   = pd.DataFrame(hasil_per_query)
@@ -299,104 +273,129 @@ def evaluasi_model(model, nama_model, k=5):
         "MAP"      : round(map_score, 4),
         "NDCG"     : round(mean_ndcg, 4),
         "Precision": round(mean_prec, 4),
-        "Recall"   : round(mean_rec, 4)
+        "Recall"   : round(mean_rec,  4),
     }
 
 # ============================================================
 # SIMPAN HASIL & GRAFIK
 # ============================================================
 
-def simpan_hasil_evaluasi(df_tfidf, df_bm25, summary_tfidf, summary_bm25):
-    os.makedirs("data", exist_ok=True)
+def simpan_hasil_evaluasi(df_eval, summary):
+    os.makedirs("data",   exist_ok=True)
+    os.makedirs("static", exist_ok=True)
 
-    df_tfidf.to_csv("data/evaluasi_tfidf.csv", index=False, encoding="utf-8-sig")
-    df_bm25.to_csv("data/evaluasi_bm25.csv",   index=False, encoding="utf-8-sig")
+    df_eval.to_csv("data/evaluasi_tfidf.csv", index=False, encoding="utf-8-sig")
 
-    summary = {"TF-IDF": summary_tfidf, "BM25": summary_bm25}
     with open("data/evaluasi_summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
+        json.dump({"TF-IDF": summary}, f, indent=2)
 
-    print(f"\n✅ Hasil evaluasi disimpan di folder data/")
+    print("\n✅ Hasil evaluasi disimpan di folder data/")
 
-    # ── Grafik 1: Perbandingan metrik ──
-    metrik    = ["MAP", "NDCG", "Precision", "Recall"]
-    val_tfidf = [summary_tfidf[m] for m in metrik]
-    val_bm25  = [summary_bm25[m]  for m in metrik]
-    x, width  = np.arange(len(metrik)), 0.35
+    qlabel = [f"Q{i+1}" for i in range(len(df_eval))]
 
-    fig, ax = plt.subplots(figsize=(9, 5))
-    bars1 = ax.bar(x - width/2, val_tfidf, width, label="TF-IDF", color="#4C72B0")
-    bars2 = ax.bar(x + width/2, val_bm25,  width, label="BM25",   color="#DD8452")
-    ax.set_title("Perbandingan Performa TF-IDF vs BM25", fontsize=14, fontweight="bold")
+    # ── Grafik 1: Metrik ringkasan (bar chart) ──
+    metrik = ["MAP", "NDCG", "Precision", "Recall"]
+    vals   = [summary[m] for m in metrik]
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    bars = ax.bar(metrik, vals, color="#839958", width=0.45, zorder=3)
+    ax.set_title("Metrik Evaluasi TF-IDF + Cosine Similarity",
+                 fontsize=13, fontweight="bold", pad=14)
     ax.set_ylabel("Skor")
-    ax.set_xticks(x)
-    ax.set_xticklabels(metrik)
-    ax.set_ylim(0, 1.1)
-    ax.legend()
-    ax.bar_label(bars1, fmt="%.3f", padding=3, fontsize=9)
-    ax.bar_label(bars2, fmt="%.3f", padding=3, fontsize=9)
+    ax.set_ylim(0, 1.15)
+    ax.bar_label(bars, fmt="%.4f", padding=4, fontsize=10)
+    ax.grid(axis="y", linestyle="--", alpha=0.4, zorder=0)
+    ax.set_facecolor("#f9f9f6")
+    fig.patch.set_facecolor("#f9f9f6")
     plt.tight_layout()
-    plt.savefig("data/grafik_perbandingan.png", dpi=150)
+    plt.savefig("data/grafik_metrik.png",   dpi=150)
+    plt.savefig("static/grafik_metrik.png", dpi=150)
     plt.close()
 
     # ── Grafik 2: AP per query ──
-    qlabel = [f"Q{i+1}" for i in range(len(df_tfidf))]
-    fig, ax = plt.subplots(figsize=(12, 5))
-    ax.plot(qlabel, df_tfidf["ap"], marker="o", label="TF-IDF", color="#4C72B0", linewidth=2)
-    ax.plot(qlabel, df_bm25["ap"],  marker="s", label="BM25",   color="#DD8452", linewidth=2)
-    ax.set_title("Average Precision per Query", fontsize=13, fontweight="bold")
+    fig, ax = plt.subplots(figsize=(12, 4.5))
+    ax.plot(qlabel, df_eval["ap"], marker="o", color="#839958",
+            linewidth=2, markersize=7, label="AP per Query")
+    ax.axhline(summary["MAP"], color="#D3968C", linestyle="--",
+               linewidth=1.5, label=f"MAP = {summary['MAP']:.4f}")
+    ax.set_title("Average Precision per Query — TF-IDF",
+                 fontsize=13, fontweight="bold", pad=12)
     ax.set_ylabel("Average Precision")
     ax.set_xlabel("Query")
     ax.set_ylim(0, 1.1)
-    ax.legend()
-    ax.grid(axis="y", linestyle="--", alpha=0.5)
-    for i, (y1, y2) in enumerate(zip(df_tfidf["ap"], df_bm25["ap"])):
-        ax.annotate(f"{y1:.2f}", (qlabel[i], y1), textcoords="offset points", xytext=(-10, 6), fontsize=8, color="#4C72B0")
-        ax.annotate(f"{y2:.2f}", (qlabel[i], y2), textcoords="offset points", xytext=(4,   6), fontsize=8, color="#DD8452")
+    ax.legend(fontsize=9)
+    ax.grid(axis="y", linestyle="--", alpha=0.4)
+    ax.set_facecolor("#f9f9f6")
+    fig.patch.set_facecolor("#f9f9f6")
+    for i, y in enumerate(df_eval["ap"]):
+        ax.annotate(f"{y:.2f}", (qlabel[i], y),
+                    textcoords="offset points", xytext=(0, 8),
+                    fontsize=8, ha="center", color="#4a5e2a")
     plt.tight_layout()
-    plt.savefig("data/grafik_ap_per_query.png", dpi=150)
+    plt.savefig("data/grafik_ap_per_query.png",   dpi=150)
+    plt.savefig("static/grafik_ap_per_query.png", dpi=150)
     plt.close()
 
     # ── Grafik 3: Precision@K per query ──
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    for ax, df_ev, nama, warna in zip(axes, [df_tfidf, df_bm25], ["TF-IDF", "BM25"], ["#4C72B0", "#DD8452"]):
-        ax.bar(qlabel, df_ev["precision_at_k"], color=warna, alpha=0.85)
-        ax.set_title(f"Precision@5 per Query — {nama}", fontweight="bold")
-        ax.set_ylabel("Precision@5")
-        ax.set_ylim(0, 1.1)
-        mean_val = df_ev["precision_at_k"].mean()
-        ax.axhline(mean_val, color="red", linestyle="--", label=f"Rata-rata: {mean_val:.3f}")
-        ax.legend()
-        ax.grid(axis="y", linestyle="--", alpha=0.4)
+    fig, ax = plt.subplots(figsize=(12, 4.5))
+    colors  = ["#839958" if v >= summary["Precision"] else "#D3968C"
+               for v in df_eval["precision_at_k"]]
+    ax.bar(qlabel, df_eval["precision_at_k"], color=colors, alpha=0.85, zorder=3)
+    mean_p = df_eval["precision_at_k"].mean()
+    ax.axhline(mean_p, color="#105666", linestyle="--",
+               linewidth=1.5, label=f"Rata-rata P@5 = {mean_p:.4f}")
+    ax.set_title("Precision@5 per Query — TF-IDF",
+                 fontsize=13, fontweight="bold", pad=12)
+    ax.set_ylabel("Precision@5")
+    ax.set_ylim(0, 1.2)
+    ax.legend(fontsize=9)
+    ax.grid(axis="y", linestyle="--", alpha=0.4, zorder=0)
+    ax.set_facecolor("#f9f9f6")
+    fig.patch.set_facecolor("#f9f9f6")
     plt.tight_layout()
-    plt.savefig("data/grafik_precision_per_query.png", dpi=150)
+    plt.savefig("data/grafik_precision_per_query.png",   dpi=150)
+    plt.savefig("static/grafik_precision_per_query.png", dpi=150)
     plt.close()
 
-    print("📊 3 grafik disimpan di folder data/")
+    # ── Grafik 4: NDCG@K per query ──
+    fig, ax = plt.subplots(figsize=(12, 4.5))
+    ax.bar(qlabel, df_eval["ndcg_at_k"], color="#105666", alpha=0.8, zorder=3)
+    ax.axhline(df_eval["ndcg_at_k"].mean(), color="#D3968C", linestyle="--",
+               linewidth=1.5, label=f"Rata-rata NDCG@5 = {summary['NDCG']:.4f}")
+    ax.set_title("NDCG@5 per Query — TF-IDF",
+                 fontsize=13, fontweight="bold", pad=12)
+    ax.set_ylabel("NDCG@5")
+    ax.set_ylim(0, 1.2)
+    ax.legend(fontsize=9)
+    ax.grid(axis="y", linestyle="--", alpha=0.4, zorder=0)
+    ax.set_facecolor("#f9f9f6")
+    fig.patch.set_facecolor("#f9f9f6")
+    plt.tight_layout()
+    plt.savefig("data/grafik_ndcg_per_query.png",   dpi=150)
+    plt.savefig("static/grafik_ndcg_per_query.png", dpi=150)
+    plt.close()
+
+    print("📊 4 grafik disimpan di data/ dan static/")
 
 # ============================================================
 # MAIN
 # ============================================================
 
 if __name__ == "__main__":
-    print("📂 Memuat model TF-IDF dan BM25...")
+    print("📂 Memuat model TF-IDF...")
     try:
         tfidf = ModelTFIDF.muat("data/model_tfidf.pkl")
-        bm25  = ModelBM25.muat("data/model_bm25.pkl")
     except FileNotFoundError:
         print("❌ Model belum ada! Jalankan dulu: python model.py")
         exit()
 
-    df_tfidf, summary_tfidf = evaluasi_model(tfidf, "TF-IDF + Cosine Similarity", k=5)
-    df_bm25,  summary_bm25  = evaluasi_model(bm25,  "BM25",                       k=5)
-
-    simpan_hasil_evaluasi(df_tfidf, df_bm25, summary_tfidf, summary_bm25)
+    df_eval, summary = evaluasi_model(tfidf, k=5)
+    simpan_hasil_evaluasi(df_eval, summary)
 
     print(f"\n{'=' * 60}")
-    print("🏆 KESIMPULAN AKHIR EVALUASI")
+    print("🏆 HASIL AKHIR EVALUASI TF-IDF")
     print(f"{'=' * 60}")
-    print(f"  TF-IDF → MAP: {summary_tfidf['MAP']:.4f} | NDCG@5: {summary_tfidf['NDCG']:.4f} | P@5: {summary_tfidf['Precision']:.4f}")
-    print(f"  BM25   → MAP: {summary_bm25['MAP']:.4f} | NDCG@5: {summary_bm25['NDCG']:.4f} | P@5: {summary_bm25['Precision']:.4f}")
-    pemenang = "TF-IDF" if summary_tfidf["MAP"] >= summary_bm25["MAP"] else "BM25"
-    print(f"\n  🥇 Model terbaik berdasarkan MAP: {pemenang}")
-    print(f"\n  ✅ Semua hasil disimpan di folder data/")
+    print(f"  MAP         : {summary['MAP']:.4f}")
+    print(f"  NDCG@5      : {summary['NDCG']:.4f}")
+    print(f"  Precision@5 : {summary['Precision']:.4f}")
+    print(f"  Recall@5    : {summary['Recall']:.4f}")
+    print(f"\n  ✅ Semua hasil disimpan di folder data/ dan static/")

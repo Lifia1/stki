@@ -3,7 +3,6 @@ import sys
 import json
 import urllib.request
 import urllib.error
-import functools
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,33 +26,28 @@ PLACEHOLDER_IMG = "https://placehold.co/260x390/0f2d1c/839958?text=No+Poster"
 # LOAD DATA & MODEL
 # ============================================================
 print("⏳ Memuat data dan model...")
-FILMS      = load_films()
+FILMS       = load_films()
 FILMS_BY_ID = {f["id"]: f for f in FILMS}
-ENGINE     = SearchEngine(FILMS)
-GENRES     = all_genres(FILMS)
+ENGINE      = SearchEngine(FILMS)
+GENRES      = all_genres(FILMS)
 
-# Load eval data
 try:
-    from evaluasi_data import EVAL_SUMMARY, EVAL_TFIDF, EVAL_BM25
+    from evaluasi_data import EVAL_SUMMARY, EVAL_TFIDF
 except Exception:
-    EVAL_SUMMARY, EVAL_TFIDF, EVAL_BM25 = None, [], []
+    EVAL_SUMMARY, EVAL_TFIDF = None, []
 
 print(f"✅ {len(FILMS)} film dimuat.")
 
 # ============================================================
-# POSTER HELPER  — cache sederhana di memori
+# POSTER HELPER
 # ============================================================
 _poster_cache: dict = {}
 
 def get_poster_url(film: dict) -> str:
-    """Ambil URL poster: dari data dulu, lalu TMDB API, lalu placeholder."""
     film_id = film.get("id")
-
-    # 1. Cek cache
     if film_id in _poster_cache:
         return _poster_cache[film_id]
 
-    # 2. Cek field poster_url / poster_path di data
     for field in ("poster_url", "poster_path"):
         val = film.get(field)
         if val:
@@ -66,7 +60,6 @@ def get_poster_url(film: dict) -> str:
                 _poster_cache[film_id] = url
                 return url
 
-    # 3. Hit TMDB API menggunakan movie_id
     if film_id is not None:
         try:
             api_url = f"{TMDB_API_BASE}/{int(film_id)}?api_key={TMDB_API_KEY}&language=en-US"
@@ -85,11 +78,9 @@ def get_poster_url(film: dict) -> str:
 
 
 def enrich_with_poster(film_dict: dict) -> dict:
-    """Tambahkan key poster_url ke dict film."""
     result = dict(film_dict)
     result["poster_url"] = get_poster_url(film_dict)
     return result
-
 
 # ============================================================
 # ROUTES
@@ -107,21 +98,19 @@ def beranda():
 
 @app.route("/cari")
 def cari():
-    query       = request.args.get("q", "").strip()
-    model_pilih = request.args.get("model", "tfidf")
-    filter_genre= request.args.get("genre", "")
-    top_k       = int(request.args.get("topk", 10))
-    hasil       = []
-    error       = None
+    query        = request.args.get("q", "").strip()
+    filter_genre = request.args.get("genre", "")
+    top_k        = int(request.args.get("topk", 10))
+    hasil        = []
+    error        = None
 
     if query:
         try:
-            hits = ENGINE.search(query, model=model_pilih, top_k=top_k * 3)
+            hits = ENGINE.search(query, top_k=top_k * 3)
             if filter_genre and filter_genre not in ("semua", ""):
                 hits = [(f, s) for f, s in hits
                         if filter_genre.lower() in str(f.get("genre", "")).lower()]
             hits = hits[:top_k]
-
             for film, skor in hits:
                 row = enrich_with_poster(film)
                 row["skor_relevansi"] = skor
@@ -130,10 +119,13 @@ def cari():
             error = f"Error saat pencarian: {str(e)}"
 
     return render_template("cari.html",
-                           query=query, model_pilih=model_pilih,
-                           filter_genre=filter_genre, top_k=top_k,
-                           genres=GENRES, hasil=hasil,
-                           error=error, jumlah=len(hasil))
+                           query=query,
+                           filter_genre=filter_genre,
+                           top_k=top_k,
+                           genres=GENRES,
+                           hasil=hasil,
+                           error=error,
+                           jumlah=len(hasil))
 
 
 @app.route("/detail/<int:film_id>")
@@ -142,9 +134,9 @@ def detail(film_id):
     if film is None:
         return render_template("404.html"), 404
 
-    film_data = enrich_with_poster(film)
+    film_data  = enrich_with_poster(film)
     serupa_raw = ENGINE.similar(film, n=7)
-    serupa = []
+    serupa     = []
     for f, s in serupa_raw:
         row = enrich_with_poster(f)
         row["skor_relevansi"] = s
@@ -157,8 +149,7 @@ def detail(film_id):
 def evaluasi():
     return render_template("evaluasi.html",
                            summary=EVAL_SUMMARY,
-                           tfidf_ev=EVAL_TFIDF,
-                           bm25_ev=EVAL_BM25)
+                           tfidf_ev=EVAL_TFIDF)
 
 
 @app.route("/tentang")
@@ -173,13 +164,12 @@ def tentang():
 # ============================================================
 @app.route("/api/cari")
 def api_cari():
-    query       = request.args.get("q", "").strip()
-    model_pilih = request.args.get("model", "tfidf")
-    top_k       = int(request.args.get("topk", 10))
+    query = request.args.get("q", "").strip()
+    top_k = int(request.args.get("topk", 10))
     if not query:
         return jsonify({"hasil": [], "jumlah": 0, "error": "Query kosong"})
     try:
-        hits  = ENGINE.search(query, model=model_pilih, top_k=top_k)
+        hits  = ENGINE.search(query, top_k=top_k)
         clean = []
         for f, s in hits:
             row = {k: (int(v) if isinstance(v, float) and v == int(v) else v)
