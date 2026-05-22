@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% set active = "tentang" %}
+{% block title %}CineFind — Tentang{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px; padding-bottom:48px;">
+
+    <div style="margin-bottom:36px;">
+        <h1 style="font-family:'Playfair Display',serif; font-size:1.8rem;
+             font-weight:700; margin-bottom:5px;">Tentang CineFind</h1>
+        <p style="color:var(--text-muted); font-size:0.84rem;">
+            Sistem Temu Kembali Informasi Film berbasis TF-IDF dan BM25
+        </p>
+    </div>
+
+    <div class="grid-2" style="gap:20px;">
+
+        <!-- KOLOM KIRI -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+
+            <!-- Deskripsi -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Deskripsi Sistem
+                </div>
+                <p style="color:var(--text-dim); line-height:1.75; font-size:0.86rem;">
+                    CineFind adalah Sistem Temu Kembali Informasi (STKI) berbasis film yang
+                    memungkinkan pengguna mencari rekomendasi film berdasarkan deskripsi
+                    mood atau genre menggunakan query teks bebas. Sistem ini dibangun sebagai
+                    proyek akhir semester mata kuliah Temu Kembali Informasi.
+                </p>
+            </div>
+
+            <!-- Dataset -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Dataset
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    {% for icon, label, val in [
+                        ('📡','Sumber','TMDB API (The Movie Database)'),
+                        ('🌐','Bahasa','Indonesia (id-ID)'),
+                        ('🎬','Total Film', total ~ ' dokumen'),
+                        ('🏷','Total Genre', genres|length ~ ' genre'),
+                        ('📝','Dokumen','Judul + Genre + Sinopsis + Tagline + Sutradara + Pemain'),
+                        ('✔','Min. kata','100 kata per dokumen'),
+                    ] %}
+                    <div style="display:flex; gap:12px; align-items:flex-start;
+                         padding:9px 12px; background:rgba(247,244,213,0.03);
+                         border-radius:7px;">
+                        <span style="font-size:1rem; flex-shrink:0;">{{ icon }}</span>
+                        <div>
+                            <span style="font-size:0.72rem; color:var(--text-muted);
+                                  text-transform:uppercase; letter-spacing:0.5px;">{{ label }}</span>
+                            <div style="font-size:0.84rem; color:var(--text-dim); margin-top:1px;">{{ val }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Preprocessing -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Preprocessing Pipeline
+                </div>
+                {% for no, nama, desc in [
+                    ('1','Case Folding',     'Ubah semua teks ke huruf kecil'),
+                    ('2','Cleaning',         'Hapus tanda baca, URL, karakter spesial'),
+                    ('3','Stopword Removal', 'Hapus kata tidak bermakna (Sastrawi)'),
+                    ('4','Stemming',         'Potong imbuhan kata (PySastrawi)'),
+                    ('5','Tokenisasi',       'Pisahkan teks menjadi token kata'),
+                ] %}
+                <div style="display:flex; gap:12px; align-items:flex-start;
+                     padding:10px 12px; background:rgba(247,244,213,0.03);
+                     border-radius:7px; margin-bottom:8px;">
+                    <div style="background:var(--accent); color:var(--bg);
+                         min-width:24px; height:24px; border-radius:50%;
+                         display:flex; align-items:center; justify-content:center;
+                         font-size:0.76rem; font-weight:700; flex-shrink:0;">{{ no }}</div>
+                    <div>
+                        <div style="font-weight:600; font-size:0.84rem; color:var(--text);">{{ nama }}</div>
+                        <div style="color:var(--text-muted); font-size:0.76rem;">{{ desc }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+
+            <!-- Model IR -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Model IR
+                </div>
+                {% for nama, color, desc in [
+                    ('TF-IDF + Cosine Similarity', '#839958',
+                     'Term Frequency-Inverse Document Frequency dengan cosine similarity. Setiap dokumen direpresentasikan sebagai vektor bobot term, lalu dihitung kemiripan sudut dengan vektor query.'),
+                    ('BM25 (Best Match 25)', '#D3968C',
+                     'Model probabilistik yang memperhitungkan frekuensi term, panjang dokumen, dan IDF. Lebih robust untuk dokumen dengan panjang bervariasi.'),
+                ] %}
+                <div style="background:rgba(247,244,213,0.03); border:1px solid {{ color }}22;
+                     border-left:3px solid {{ color }}; border-radius:8px;
+                     padding:14px 16px; margin-bottom:12px;">
+                    <div style="font-weight:600; font-size:0.86rem; color:{{ color }};
+                         margin-bottom:5px;">{{ nama }}</div>
+                    <div style="color:var(--text-muted); font-size:0.79rem; line-height:1.65;">{{ desc }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Evaluasi -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Metrik Evaluasi
+                </div>
+                {% for nama, desc in [
+                    ('MAP',        'Mean Average Precision — rata-rata precision di seluruh query'),
+                    ('NDCG@5',     'Normalized DCG — mempertimbangkan posisi dokumen relevan'),
+                    ('Precision@5','Proporsi dokumen relevan dari 5 hasil teratas'),
+                    ('Recall@5',   'Proporsi dokumen relevan yang berhasil ditemukan'),
+                ] %}
+                <div style="display:flex; gap:12px; padding:9px 12px;
+                     background:rgba(247,244,213,0.03); border-radius:7px; margin-bottom:7px;
+                     align-items:flex-start;">
+                    <span style="background:rgba(131,153,88,0.15); color:var(--accent);
+                          padding:2px 10px; border-radius:5px; font-size:0.74rem;
+                          font-weight:700; white-space:nowrap; flex-shrink:0; align-self:flex-start;
+                          margin-top:1px;">{{ nama }}</span>
+                    <span style="color:var(--text-muted); font-size:0.79rem; line-height:1.55;">{{ desc }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Teknologi -->
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px;">
+                <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+                     color:var(--accent); text-transform:uppercase; margin-bottom:14px;">
+                    Teknologi
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    {% for t in ['Python','Flask','Scikit-learn','PySastrawi','rank-bm25','TMDB API','Pandas','Matplotlib','NLTK'] %}
+                    <span style="background:rgba(247,244,213,0.05); border:1px solid var(--border);
+                          color:var(--text-dim); padding:4px 12px; border-radius:20px;
+                          font-size:0.76rem;">{{ t }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO PROYEK -->
+    <div style="background:rgba(131,153,88,0.06); border:1px solid var(--border);
+         border-radius:12px; padding:24px 28px; margin-top:24px; text-align:center;">
+        <div style="font-size:0.68rem; font-weight:700; letter-spacing:2px;
+             color:var(--accent); text-transform:uppercase; margin-bottom:8px;">
+            Proyek UAS — Temu Kembali Informasi
+        </div>
+        <div style="color:var(--text-muted); font-size:0.84rem; line-height:2;">
+            Mata Kuliah: Temu Kembali Informasi (COM620321) &nbsp;·&nbsp; Beban Kredit: 3 (2-1)<br>
+            Universitas Lampung &nbsp;·&nbsp; Fakultas MIPA &nbsp;·&nbsp; Periode 2025–2026 Genap<br>
+            Deadline: 17 Juni 2026
+        </div>
+    </div>
+
+</div>
+{% endblock %}

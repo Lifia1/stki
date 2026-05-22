@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% set active = "beranda" %}
+{% block title %}CineFind — Beranda{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div style="position:relative; overflow:hidden; padding:72px 40px 60px; text-align:center;
+     background:linear-gradient(170deg,#091e14 0%,#0c2a18 40%,#091e14 100%);">
+    <div style="position:absolute;width:500px;height:500px;border-radius:50%;
+         background:radial-gradient(circle,rgba(131,153,88,0.07),transparent 70%);
+         top:-150px;left:-100px;pointer-events:none;"></div>
+    <div style="position:absolute;width:400px;height:400px;border-radius:50%;
+         background:radial-gradient(circle,rgba(16,86,102,0.1),transparent 70%);
+         bottom:-100px;right:-50px;pointer-events:none;"></div>
+
+    <div style="position:relative;z-index:1;max-width:680px;margin:0 auto;">
+        <div style="display:inline-block;font-size:0.7rem;font-weight:600;letter-spacing:3px;
+             color:var(--accent);text-transform:uppercase;padding:5px 16px;margin-bottom:20px;
+             background:rgba(131,153,88,0.1);border:1px solid var(--border);border-radius:20px;">
+            Sistem Temu Kembali Informasi Film
+        </div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2.4rem,6vw,4rem);
+             font-weight:700;line-height:1.15;margin-bottom:18px;color:var(--beige);">
+            Temukan Film yang<br><span style="color:var(--accent);">Tepat Untukmu</span>
+        </h1>
+        <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.75;margin-bottom:36px;">
+            Cari film berdasarkan genre, suasana hati, atau cerita menggunakan model
+            <strong style="color:var(--text-dim);">TF-IDF</strong> dan <strong style="color:var(--text-dim);">BM25</strong>.
+        </p>
+        <form action="/cari" method="get" style="display:flex;gap:10px;max-width:580px;margin:0 auto;">
+            <input class="search-input" name="q"
+                   placeholder="Contoh: film horor menegangkan, atau aksi superhero...">
+            <button class="btn btn-primary" type="submit" style="white-space:nowrap;padding:10px 24px;">
+                Cari
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- STATS BAR -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);">
+    <div class="container">
+        <div style="display:flex;justify-content:center;gap:0;padding:0;">
+            {% for label, val in [('Total Film', total),('Genre', genres|length),('Model IR', 2),('Query Uji', 10)] %}
+            <div style="flex:1;max-width:180px;text-align:center;padding:18px 12px;
+                 {% if not loop.last %}border-right:1px solid var(--border);{% endif %}">
+                <div style="font-family:'Playfair Display',serif;font-size:1.9rem;
+                     font-weight:700;color:var(--accent);">{{ val }}</div>
+                <div style="color:var(--text-muted);font-size:0.7rem;letter-spacing:1px;
+                     text-transform:uppercase;margin-top:2px;">{{ label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- FILM POPULER -->
+<div class="container" style="padding-top:48px;">
+    <div class="section-header">
+        <div class="section-bar"></div>
+        <h2 class="section-title">Film Terpopuler</h2>
+    </div>
+    <div class="grid-6">
+        {% for film in film_populer %}
+        {% set genres_list = film.genre.split(',') if film.genre else [] %}
+        <a href="/detail/{{ film.id }}" style="text-decoration:none;">
+            <div class="film-card">
+                <div class="film-card-poster">
+                    {% if film.poster_url %}
+                    <img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="onImgError(this)">
+                    {% endif %}
+                    <div class="film-card-initials" {% if film.poster_url %}style="display:none;"{% endif %}>
+                        {{ film.judul[:2]|upper }}
+                    </div>
+                    <div class="film-card-rating">★ {{ "%.1f"|format(film.rating|float) }}</div>
+                </div>
+                <div class="film-card-body">
+                    <div class="film-card-title">{{ film.judul }}</div>
+                    <div class="film-card-meta">{{ film.tahun|string|truncate(4,True,'') }}</div>
+                    <div>
+                        {% for g in genres_list[:2] %}
+                        <span class="badge-genre">{{ g.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- CONTOH QUERY -->
+<div class="container" style="padding-top:48px;padding-bottom:48px;">
+    <div class="section-header">
+        <div class="section-bar" style="background:linear-gradient(to bottom,var(--rosy-brown),var(--midnight));"></div>
+        <h2 class="section-title">Coba Query Ini</h2>
+    </div>
+    <div class="grid-3">
+        {% set contoh = [
+            ('Superhero Aksi',   'film superhero aksi petualangan Marvel DC'),
+            ('Horor Menegangkan','film horor seram menegangkan hantu monster'),
+            ('Drama Romantis',   'film drama percintaan romantis cinta mengharukan'),
+            ('Fiksi Ilmiah',     'film fiksi ilmiah luar angkasa teknologi masa depan'),
+            ('Komedi Segar',     'film komedi humor ringan lucu menghibur'),
+            ('Fantasi Sihir',    'film sihir fantasi petualangan penyihir'),
+        ] %}
+        {% for label, q in contoh %}
+        <a href="/cari?q={{ q }}" style="text-decoration:none;">
+            <div style="background:var(--surface);border:1px solid var(--border);
+                 border-radius:10px;padding:16px 18px;transition:all .25s;height:100%;"
+                 onmouseover="this.style.borderColor='var(--border-strong)';this.style.background='var(--surface2)'"
+                 onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+                <div style="font-size:0.88rem;font-weight:600;margin-bottom:5px;color:var(--text);">{{ label }}</div>
+                <div style="color:var(--text-muted);font-size:0.76rem;font-style:italic;">"{{ q[:50] }}..."</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

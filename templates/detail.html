@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% set active = "cari" %}
+{% block title %}{{ film.judul }} — CineFind{% endblock %}
+
+{% block content %}
+
+<!-- HERO DETAIL -->
+<div style="background:linear-gradient(160deg,#0c2a18 0%,#091e14 100%);
+     padding:48px 40px 40px;position:relative;overflow:hidden;border-bottom:1px solid var(--border);">
+    <div style="position:absolute;width:600px;height:600px;border-radius:50%;
+         background:radial-gradient(circle,rgba(131,153,88,0.06),transparent 70%);
+         top:-200px;right:-100px;pointer-events:none;"></div>
+
+    <div style="max-width:1160px;margin:0 auto;display:flex;gap:36px;
+         align-items:flex-start;position:relative;z-index:1;">
+
+        <!-- Poster besar -->
+        <div style="min-width:200px;height:300px;flex-shrink:0;border-radius:14px;
+             overflow:hidden;border:1px solid var(--border-strong);
+             box-shadow:0 20px 50px rgba(0,0,0,0.5);
+             background:linear-gradient(135deg,var(--dark-green),var(--teal));
+             position:relative;">
+            {% if film.poster_url %}
+            <img src="{{ film.poster_url }}" alt="{{ film.judul }}"
+                 style="width:100%;height:100%;object-fit:cover;display:block;"
+                 onerror="this.style.display='none'; document.getElementById('detail-init').style.display='flex';">
+            {% endif %}
+            <div id="detail-init" style="position:absolute;inset:0;display:{% if film.poster_url %}none{% else %}flex{% endif %};
+                 align-items:center;justify-content:center;
+                 font-family:'Playfair Display',serif;font-size:4rem;color:rgba(247,244,213,0.15);">
+                {{ film.judul[:2]|upper }}
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div style="flex:1;">
+            <div style="margin-bottom:12px;">
+                {% for g in (film.genre or '').split(',') %}
+                <span class="badge-genre">{{ g.strip() }}</span>
+                {% endfor %}
+            </div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:2rem;
+                 font-weight:700;margin-bottom:6px;line-height:1.2;">{{ film.judul }}</h1>
+            {% if film.tagline %}
+            <div style="font-style:italic;color:var(--text-muted);margin-bottom:18px;font-size:0.9rem;">
+                "{{ film.tagline }}"
+            </div>
+            {% endif %}
+
+            <div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;">
+                <div style="background:rgba(131,153,88,0.12);border:1px solid var(--border);
+                     padding:8px 16px;border-radius:8px;text-align:center;">
+                    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;
+                         color:var(--accent);font-weight:700;">{{ "%.1f"|format(film.rating|float) }}</div>
+                    <div style="font-size:0.62rem;color:var(--text-muted);letter-spacing:1px;">RATING</div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);
+                     padding:8px 16px;border-radius:8px;text-align:center;">
+                    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);">
+                        {{ film.tahun|string|truncate(4,True,'') }}
+                    </div>
+                    <div style="font-size:0.62rem;color:var(--text-muted);letter-spacing:1px;">TAHUN</div>
+                </div>
+                {% if film.bahasa_asli %}
+                <div style="background:var(--surface);border:1px solid var(--border);
+                     padding:8px 16px;border-radius:8px;text-align:center;">
+                    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);">
+                        {{ film.bahasa_asli|upper }}
+                    </div>
+                    <div style="font-size:0.62rem;color:var(--text-muted);letter-spacing:1px;">BAHASA</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="background:rgba(247,244,213,0.03);border:1px solid var(--border);
+                 border-radius:10px;padding:16px 20px;">
+                <div style="font-size:0.66rem;color:var(--text-muted);letter-spacing:2px;
+                     text-transform:uppercase;margin-bottom:8px;">Sinopsis</div>
+                <div style="color:var(--text-dim);line-height:1.75;font-size:0.86rem;">
+                    {{ film.sinopsis or '–' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETAIL INFO -->
+<div class="container" style="padding-top:32px;">
+    <div class="grid-3" style="margin-bottom:14px;">
+        {% for label, val in [
+            ('Sutradara', film.sutradara or '–'),
+            ('Produksi',  (film.produksi or '–')|truncate(60,True,'...')),
+            ('Negara',    film.negara or '–'),
+        ] %}
+        <div class="metric-card">
+            <div class="metric-label">{{ label }}</div>
+            <div style="color:var(--text);font-size:0.88rem;margin-top:5px;">{{ val }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if film.pemain %}
+    <div class="metric-card" style="margin-bottom:28px;">
+        <div class="metric-label">Pemain</div>
+        <div style="color:var(--text-dim);font-size:0.86rem;margin-top:6px;line-height:1.75;">
+            {{ film.pemain }}
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="javascript:history.back()" class="btn btn-ghost" style="margin-bottom:40px;">← Kembali</a>
+</div>
+
+<!-- FILM SERUPA -->
+{% if serupa %}
+<div style="border-top:1px solid var(--border);padding-top:40px;padding-bottom:48px;">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-bar"></div>
+            <h2 class="section-title">Film Serupa</h2>
+        </div>
+        <div class="grid-6">
+            {% for s in serupa %}
+            <a href="/detail/{{ s.id }}" style="text-decoration:none;">
+                <div class="film-card">
+                    <div class="film-card-poster">
+                        {% if s.poster_url %}
+                        <img src="{{ s.poster_url }}" alt="{{ s.judul }}" onerror="onImgError(this)">
+                        {% endif %}
+                        <div class="film-card-initials" {% if s.poster_url %}style="display:none;"{% endif %}>
+                            {{ s.judul[:2]|upper }}
+                        </div>
+                        <div class="film-card-rating">★ {{ "%.1f"|format(s.rating|float) }}</div>
+                    </div>
+                    <div class="film-card-body">
+                        <div class="film-card-title">{{ s.judul }}</div>
+                        <div class="film-card-meta">{{ s.tahun|string|truncate(4,True,'') }}</div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

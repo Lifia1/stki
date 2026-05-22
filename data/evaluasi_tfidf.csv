@@ -1,0 +1,11 @@
+﻿no,query,precision_at_k,recall_at_k,ap,ndcg_at_k
+1,film superhero aksi petualangan Marvel DC,1.0,0.1923,0.3277,1.0
+2,film sihir fantasi petualangan penyihir dunia sihir,1.0,0.3333,0.5333,1.0
+3,film horor seram menegangkan hantu monster zombie,0.6,0.1765,0.1898,0.6164
+4,film animasi lucu keluarga anak-anak kartun,0.2,0.04,0.0289,0.214
+5,film aksi laga kriminal penjahat polisi kejahatan,0.8,0.1739,0.2341,0.8539
+6,film fiksi ilmiah luar angkasa teknologi masa depan robot,0.4,0.1053,0.114,0.5087
+7,film misteri detektif thriller investigasi pembunuhan,0.8,0.2857,0.2744,0.786
+8,film petualangan alam liar bertahan hidup ekspedisi,0.2,0.0667,0.05,0.214
+9,film komedi humor ringan lucu menghibur,0.8,0.16,0.2183,0.786
+10,film drama percintaan romantis cinta mengharukan,1.0,0.2941,0.4044,1.0

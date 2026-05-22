@@ -1,0 +1,14 @@
+{
+  "TF-IDF": {
+    "MAP": 0.2375,
+    "NDCG": 0.6979,
+    "Precision": 0.68,
+    "Recall": 0.1828
+  },
+  "BM25": {
+    "MAP": 0.2535,
+    "NDCG": 0.6867,
+    "Precision": 0.62,
+    "Recall": 0.1664
+  }
+}

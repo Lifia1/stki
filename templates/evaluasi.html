@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% set active = "evaluasi" %}
+{% block title %}CineFind — Evaluasi{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px; padding-bottom:48px;">
+
+    <div style="margin-bottom:32px;">
+        <h1 style="font-family:'Playfair Display',serif; font-size:1.8rem;
+             font-weight:700; margin-bottom:5px;">Evaluasi Sistem</h1>
+        <p style="color:var(--text-muted); font-size:0.84rem;">
+            Perbandingan performa TF-IDF vs BM25 menggunakan MAP, NDCG, Precision@5, dan Recall@5
+        </p>
+    </div>
+
+    {% if summary %}
+
+    <!-- METRIK RINGKASAN -->
+    <div class="grid-2" style="margin-bottom:28px;">
+        {% for nama, key, color, bg in [
+            ('TF-IDF + Cosine Similarity', 'TF-IDF', '#839958', 'rgba(131,153,88,0.07)'),
+            ('BM25', 'BM25', '#D3968C', 'rgba(211,150,140,0.07)')
+        ] %}
+        <div style="background:{{ bg }}; border:1px solid {{ color }}33;
+             border-radius:12px; padding:22px 24px;">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:2px;
+                 color:{{ color }}; margin-bottom:18px; text-transform:uppercase;">
+                ● {{ nama }}
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
+                {% for label, mk in [('MAP','MAP'),('NDCG@5','NDCG'),('P@5','Precision'),('R@5','Recall')] %}
+                <div class="metric-card" style="border-color:{{ color }}22; padding:12px 14px;">
+                    <div class="metric-label">{{ label }}</div>
+                    <div class="metric-val" style="color:{{ color }}; font-size:1.5rem;">
+                        {{ "%.4f"|format(summary[key][mk]|float) }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- GRAFIK -->
+    <div style="font-size:0.68rem; color:var(--text-muted); letter-spacing:2px;
+         text-transform:uppercase; margin-bottom:16px;">Visualisasi Performa</div>
+    <div class="grid-2" style="margin-bottom:14px;">
+        <div class="metric-card">
+            <img src="/static/grafik_perbandingan.png" style="width:100%; border-radius:6px;" alt="Perbandingan">
+            <div style="color:var(--text-muted); font-size:0.72rem; text-align:center; margin-top:8px;">
+                Perbandingan Metrik TF-IDF vs BM25
+            </div>
+        </div>
+        <div class="metric-card">
+            <img src="/static/grafik_ap_per_query.png" style="width:100%; border-radius:6px;" alt="AP per Query">
+            <div style="color:var(--text-muted); font-size:0.72rem; text-align:center; margin-top:8px;">
+                Average Precision per Query
+            </div>
+        </div>
+    </div>
+    <div class="metric-card" style="margin-bottom:28px;">
+        <img src="/static/grafik_precision_per_query.png" style="width:100%; border-radius:6px;" alt="Precision per Query">
+        <div style="color:var(--text-muted); font-size:0.72rem; text-align:center; margin-top:8px;">
+            Precision@5 per Query
+        </div>
+    </div>
+
+    <!-- TABEL DETAIL -->
+    <div style="font-size:0.68rem; color:var(--text-muted); letter-spacing:2px;
+         text-transform:uppercase; margin-bottom:16px;">Detail per Query</div>
+
+    <!-- Tab buttons -->
+    <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:0;">
+        <button onclick="switchTab('tfidf')" id="btnTfidf"
+                style="background:transparent; border:none; border-bottom:2px solid var(--accent);
+                       padding:10px 22px; cursor:pointer; font-family:'DM Sans',sans-serif;
+                       font-size:0.84rem; font-weight:600; color:var(--accent);">
+            TF-IDF
+        </button>
+        <button onclick="switchTab('bm25')" id="btnBm25"
+                style="background:transparent; border:none; border-bottom:2px solid transparent;
+                       padding:10px 22px; cursor:pointer; font-family:'DM Sans',sans-serif;
+                       font-size:0.84rem; font-weight:500; color:var(--text-muted);">
+            BM25
+        </button>
+    </div>
+
+    <!-- TF-IDF Table -->
+    <div id="tabTfidf" style="background:var(--surface); border:1px solid var(--border);
+         border-top:none; border-radius:0 0 10px 10px; overflow-x:auto; margin-bottom:24px;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>No</th><th>Query</th>
+                    <th style="text-align:right;">Precision@5</th>
+                    <th style="text-align:right;">Recall@5</th>
+                    <th style="text-align:right;">AP</th>
+                    <th style="text-align:right;">NDCG@5</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in tfidf_ev %}
+                <tr>
+                    <td style="color:var(--text-muted);">{{ row.no }}</td>
+                    <td>{{ row.query }}</td>
+                    <td style="text-align:right; color:var(--accent); font-weight:600;">{{ "%.4f"|format(row.precision_at_k|float) }}</td>
+                    <td style="text-align:right; color:var(--text-dim);">{{ "%.4f"|format(row.recall_at_k|float) }}</td>
+                    <td style="text-align:right; color:var(--accent); font-weight:600;">{{ "%.4f"|format(row.ap|float) }}</td>
+                    <td style="text-align:right; color:var(--text-dim);">{{ "%.4f"|format(row.ndcg_at_k|float) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- BM25 Table -->
+    <div id="tabBm25" style="display:none; background:var(--surface); border:1px solid var(--border);
+         border-top:none; border-radius:0 0 10px 10px; overflow-x:auto; margin-bottom:24px;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>No</th><th>Query</th>
+                    <th style="text-align:right;">Precision@5</th>
+                    <th style="text-align:right;">Recall@5</th>
+                    <th style="text-align:right;">AP</th>
+                    <th style="text-align:right;">NDCG@5</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in bm25_ev %}
+                <tr>
+                    <td style="color:var(--text-muted);">{{ row.no }}</td>
+                    <td>{{ row.query }}</td>
+                    <td style="text-align:right; color:var(--rosy-brown); font-weight:600;">{{ "%.4f"|format(row.precision_at_k|float) }}</td>
+                    <td style="text-align:right; color:var(--text-dim);">{{ "%.4f"|format(row.recall_at_k|float) }}</td>
+                    <td style="text-align:right; color:var(--rosy-brown); font-weight:600;">{{ "%.4f"|format(row.ap|float) }}</td>
+                    <td style="text-align:right; color:var(--text-dim);">{{ "%.4f"|format(row.ndcg_at_k|float) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- KESIMPULAN -->
+    {% set pemenang = 'TF-IDF' if summary['TF-IDF']['MAP'] >= summary['BM25']['MAP'] else 'BM25' %}
+    {% set selisih  = (summary['TF-IDF']['MAP'] - summary['BM25']['MAP'])|abs %}
+    <div style="background:rgba(131,153,88,0.07); border:1px solid var(--border);
+         border-left:3px solid var(--accent); border-radius:10px; padding:20px 24px;">
+        <div style="font-size:0.7rem; font-weight:700; letter-spacing:2px;
+             color:var(--accent); text-transform:uppercase; margin-bottom:10px;">
+            Kesimpulan
+        </div>
+        <div style="color:var(--text-dim); line-height:1.75; font-size:0.86rem;">
+            Berdasarkan evaluasi dengan <strong style="color:var(--text);">10 query pengujian</strong>,
+            model <strong style="color:var(--accent);">{{ pemenang }}</strong>
+            menunjukkan performa lebih baik dengan selisih MAP
+            <strong style="color:var(--text);">{{ "%.4f"|format(selisih) }}</strong>.
+            Evaluasi dilakukan menggunakan ground truth yang ditentukan secara manual
+            berdasarkan relevansi film terhadap query.
+        </div>
+    </div>
+
+    {% else %}
+    <div style="text-align:center; padding:60px 0;">
+        <div style="font-size:2.5rem; margin-bottom:14px; opacity:.5;">📊</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.3rem;
+             color:var(--text-muted); margin-bottom:8px;">Data Evaluasi Belum Tersedia</div>
+        <div style="color:var(--text-muted); font-size:0.84rem;">
+            Jalankan terlebih dahulu: <code style="background:var(--surface); padding:2px 8px;
+            border-radius:4px; font-size:0.8rem;">python evaluasi.py</code>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+function switchTab(tab) {
+    const isTfidf = tab === 'tfidf';
+    document.getElementById('tabTfidf').style.display = isTfidf ? '' : 'none';
+    document.getElementById('tabBm25').style.display  = isTfidf ? 'none' : '';
+    const activeColor   = 'var(--accent)';
+    const inactiveColor = 'var(--text-muted)';
+    const activeBorder  = '2px solid var(--accent)';
+    const noBorder      = '2px solid transparent';
+    document.getElementById('btnTfidf').style.color              = isTfidf ? activeColor : inactiveColor;
+    document.getElementById('btnTfidf').style.borderBottomColor  = isTfidf ? 'var(--accent)' : 'transparent';
+    document.getElementById('btnBm25').style.color               = isTfidf ? inactiveColor : 'var(--rosy-brown)';
+    document.getElementById('btnBm25').style.borderBottomColor   = isTfidf ? 'transparent' : 'var(--rosy-brown)';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% set active = "cari" %}
+{% block title %}CineFind — Cari Film{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px;padding-bottom:48px;">
+
+    <div style="margin-bottom:28px;">
+        <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:4px;">Cari Film</h1>
+        <p style="color:var(--text-muted);font-size:0.84rem;">Masukkan kata kunci bebas — genre, suasana, atau deskripsi film yang kamu cari</p>
+    </div>
+
+    <!-- FORM -->
+    <form action="/cari" method="get">
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+            <input class="search-input" name="q" value="{{ query }}"
+                   placeholder="Contoh: film horor menegangkan, atau petualangan keluarga..." autofocus>
+            <button class="btn btn-primary" type="submit" style="padding:10px 24px;white-space:nowrap;">Cari</button>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+            <div>
+                <label class="form-label">Model IR</label>
+                <select name="model" class="search-select">
+                    <option value="tfidf" {% if model_pilih=='tfidf' %}selected{% endif %}>TF-IDF + Cosine Similarity</option>
+                    <option value="bm25"  {% if model_pilih=='bm25'  %}selected{% endif %}>BM25 Okapi</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Filter Genre</label>
+                <select name="genre" class="search-select">
+                    <option value="semua">Semua Genre</option>
+                    {% for g in genres %}
+                    <option value="{{ g }}" {% if filter_genre==g %}selected{% endif %}>{{ g }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Jumlah Hasil</label>
+                <select name="topk" class="search-select">
+                    {% for k in [5,10,15,20] %}
+                    <option value="{{ k }}" {% if top_k==k %}selected{% endif %}>Top {{ k }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <div class="divider"></div>
+
+    {% if error %}<div class="alert alert-warn">⚠ {{ error }}</div>{% endif %}
+
+    {% if query and hasil %}
+    <!-- RESULT HEADER -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+        <span style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;">
+            {{ jumlah }} Film Ditemukan
+        </span>
+        <span style="background:rgba(131,153,88,0.12);color:var(--accent);padding:3px 12px;
+             border-radius:20px;font-size:0.72rem;font-weight:600;border:1px solid var(--border);">
+            {{ 'TF-IDF' if model_pilih=='tfidf' else 'BM25' }}
+        </span>
+        <span style="color:var(--text-muted);font-size:0.8rem;">untuk: <em>"{{ query }}"</em></span>
+    </div>
+
+    {% for film in hasil %}
+    {% set persen = [((film.skor_relevansi|float)*100)|int, 100]|min %}
+    {% set genres_list = film.genre.split(',') if film.genre else [] %}
+    <div class="result-item">
+        <!-- Poster kecil -->
+        <a href="/detail/{{ film.id }}" style="text-decoration:none;flex-shrink:0;">
+            <div class="result-poster">
+                {% if film.poster_url %}
+                <img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="onImgError(this)">
+                {% endif %}
+                <div class="result-poster-init" {% if film.poster_url %}style="display:none;"{% endif %}>
+                    {{ film.judul[:2]|upper }}
+                </div>
+            </div>
+        </a>
+        <!-- Rank -->
+        <div class="result-rank {% if loop.index <= 3 %}top3{% else %}normal{% endif %}">
+            {{ loop.index }}
+        </div>
+        <!-- Info -->
+        <div class="result-info">
+            <div class="result-title">
+                <a href="/detail/{{ film.id }}">{{ film.judul }}</a>
+            </div>
+            <div class="result-meta">
+                {{ film.tahun|string|truncate(4,True,'') }}
+                {% if film.sutradara %}&nbsp;·&nbsp;{{ film.sutradara|truncate(40,True,'...') }}{% endif %}
+            </div>
+            <div style="margin-bottom:9px;">
+                {% for g in genres_list[:3] %}
+                <span class="badge-genre">{{ g.strip() }}</span>
+                {% endfor %}
+            </div>
+            <div class="result-synopsis">{{ film.sinopsis }}</div>
+        </div>
+        <!-- Score -->
+        <div class="result-score">
+            <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:3px;letter-spacing:1px;">RELEVANSI</div>
+            <div class="score-num">{{ persen }}%</div>
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ persen }}%;"></div></div>
+            <div style="font-size:0.72rem;color:var(--accent);margin-bottom:10px;">★ {{ "%.1f"|format(film.rating|float) }}</div>
+            <a href="/detail/{{ film.id }}" class="btn btn-ghost" style="font-size:0.74rem;padding:5px 12px;">Detail</a>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% elif query and not hasil and not error %}
+    <div style="text-align:center;padding:64px 0;">
+        <div style="font-size:2.8rem;margin-bottom:14px;opacity:.5;">🎬</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-muted);margin-bottom:8px;">Tidak Ada Hasil</div>
+        <div style="color:var(--text-muted);font-size:0.85rem;">Coba ubah kata kunci atau filter genre</div>
+    </div>
+
+    {% else %}
+    <div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;">
+        💡 Contoh Query Pencarian
+    </div>
+    <div class="grid-3">
+        {% set contoh = [
+            ('Superhero Aksi',   'film superhero aksi petualangan Marvel DC'),
+            ('Horor Menegangkan','film horor seram menegangkan hantu monster'),
+            ('Drama Romantis',   'film drama percintaan romantis cinta mengharukan'),
+            ('Fiksi Ilmiah',     'film fiksi ilmiah luar angkasa teknologi masa depan'),
+            ('Komedi Segar',     'film komedi humor ringan lucu menghibur'),
+            ('Fantasi Sihir',    'film sihir fantasi petualangan penyihir'),
+        ] %}
+        {% for label, q in contoh %}
+        <a href="/cari?q={{ q }}" style="text-decoration:none;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;
+                 padding:14px 16px;transition:all .25s;margin-bottom:10px;"
+                 onmouseover="this.style.borderColor='var(--border-strong)'"
+                 onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size:0.86rem;font-weight:600;margin-bottom:4px;">{{ label }}</div>
+                <div style="color:var(--text-muted);font-size:0.76rem;font-style:italic;">"{{ q[:55] }}..."</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
