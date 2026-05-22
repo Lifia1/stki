@@ -1,7 +1,6 @@
 # CineFind — Sistem Temu Kembali Informasi Film
 
-Proyek UAS Temu Kembali Informasi (COM620321)  
-Universitas Lampung FMIPA · Periode 2025-2026 Genap
+Proyek UAS Temu Kembali Informasi (COM620321) 
 
 ## Cara Menjalankan
 
