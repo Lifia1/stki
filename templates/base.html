@@ -141,10 +141,13 @@
             border-color: var(--border-strong);
         }
         .film-card-poster {
-            height: 200px; position: relative; overflow: hidden;
+            width: 100%; height: 0;
+            padding-bottom: 150%;
+            position: relative; overflow: hidden;
             background: linear-gradient(135deg, var(--dark-green), var(--teal));
         }
         .film-card-poster img {
+            position: absolute; inset: 0;
             width: 100%; height: 100%; object-fit: cover;
             transition: transform .3s ease;
         }
@@ -154,6 +157,7 @@
             display: flex; align-items: center; justify-content: center;
             font-family: 'Playfair Display', serif;
             font-size: 3rem; color: rgba(247,244,213,0.12);
+            z-index: 0;
         }
         .film-card-rating {
             position: absolute; top: 8px; right: 8px;
