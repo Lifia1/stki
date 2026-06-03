@@ -4,79 +4,69 @@
 
 {% block head_extra %}
 <style>
-/* hide base footer, override container */
 body > main + footer { display: none; }
 .container { max-width: 100%; padding: 0; }
 
 /* ══ HERO ══════════════════════════════════════════ */
 .hero-section {
     position: relative;
-    /* Isi penuh viewport dikurangi navbar ~52px */
     height: calc(100vh - 52px);
-    min-height: 500px;
-    max-height: 780px;
+    min-height: 560px;
+    max-height: 900px;
     overflow: hidden;
     background: var(--bg);
     display: flex;
     align-items: stretch;
 }
-
-/* Kiri: area teks info */
 .hero-left {
-    flex: 0 0 42%;
+    flex: 0 0 44%;
     display: flex;
     align-items: center;
-    padding: 0 clamp(32px, 4.5vw, 68px);
+    padding: 0 clamp(40px, 5vw, 80px);
     position: relative;
     z-index: 2;
-    background: linear-gradient(to right, var(--bg) 58%, transparent 100%);
+    background: linear-gradient(to right, var(--bg) 60%, transparent 100%);
 }
-
-/* Kanan: area poster */
 .hero-right {
     flex: 1;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(14px, 1.8vw, 26px);
-    padding: 28px clamp(28px, 4vw, 60px) 28px 0;
+    gap: clamp(16px, 2vw, 28px);
+    padding: 32px clamp(32px, 4.5vw, 70px) 32px 0;
     overflow: hidden;
     background: var(--bg);
 }
-
-/* Fade seamless kiri */
 .hero-right::before {
     content: '';
     position: absolute;
     left: 0; top: 0; bottom: 0;
-    width: 70px;
+    width: 80px;
     background: linear-gradient(to right, var(--bg), transparent);
     z-index: 2;
     pointer-events: none;
 }
-
-/* Poster utama — tinggi 86% hero */
 .hero-poster-main {
     flex-shrink: 0;
-    height: calc((100vh - 52px) * 0.86);
-    min-height: 360px;
-    max-height: 640px;
-    width: calc(((100vh - 52px) * 0.86) * 0.67);
-    min-width: 242px;
-    max-width: 430px;
-    border-radius: clamp(10px, 1.2vw, 16px);
+    height: calc((100vh - 52px) * 0.88);
+    min-height: 380px;
+    max-height: 700px;
+    width: calc(((100vh - 52px) * 0.88) * 0.67);
+    min-width: 255px;
+    max-width: 470px;
+    border-radius: clamp(12px, 1.3vw, 18px);
     overflow: hidden;
     border: 2px solid rgba(131,153,88,0.5);
-    box-shadow: 0 24px 72px rgba(0,0,0,0.72), 0 0 0 1px rgba(131,153,88,0.12);
+    box-shadow: 0 28px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(131,153,88,0.12);
     position: relative;
     z-index: 1;
     background: var(--surface);
     transition: box-shadow .3s, transform .3s;
 }
 .hero-poster-main:hover {
-    box-shadow: 0 28px 88px rgba(0,0,0,0.85), 0 0 0 2px rgba(131,153,88,0.38);
-    transform: translateY(-3px);
+    box-shadow: 0 32px 96px rgba(0,0,0,0.88), 0 0 0 2px rgba(131,153,88,0.4);
+    transform: translateY(-4px);
 }
 .hero-poster-main img {
     width: 100%; height: 100%; object-fit: cover;
@@ -84,22 +74,20 @@ body > main + footer { display: none; }
 }
 .hero-poster-main:hover img { transform: scale(1.04); }
 .hero-poster-main img.fade-out { opacity: 0; transform: scale(0.97); }
-
-/* Thumbnail — sejajar tinggi poster utama, lebih lebar */
 .hero-poster-previews {
     display: flex;
     flex-direction: column;
-    gap: clamp(10px, 1.1vw, 16px);
+    gap: clamp(12px, 1.2vw, 18px);
     z-index: 1;
-    height: calc((100vh - 52px) * 0.86);
-    min-height: 360px;
-    max-height: 640px;
+    height: calc((100vh - 52px) * 0.88);
+    min-height: 380px;
+    max-height: 700px;
     justify-content: space-between;
 }
 .hero-poster-thumb {
     flex: 1;
-    width: clamp(100px, 11vw, 170px);
-    border-radius: clamp(7px, 0.8vw, 12px);
+    width: clamp(110px, 12vw, 185px);
+    border-radius: clamp(8px, 0.9vw, 13px);
     overflow: hidden;
     border: 1.5px solid var(--border);
     cursor: pointer;
@@ -112,100 +100,107 @@ body > main + footer { display: none; }
 .hero-poster-thumb.active {
     opacity: 1;
     border-color: var(--accent);
-    box-shadow: 0 6px 22px rgba(0,0,0,0.55);
-    transform: translateX(-5px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+    transform: translateX(-6px);
 }
 .hero-poster-thumb.active { border-width: 2px; }
-.hero-poster-thumb img {
-    width: 100%; height: 100%; object-fit: cover;
-}
-
-/* Konten teks kiri */
-.hero-content {
-    transition: opacity .35s;
-    width: 100%;
-}
+.hero-poster-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.hero-content { transition: opacity .35s; width: 100%; }
 .hero-meta-tag {
-    font-size: clamp(0.62rem, 0.75vw, 0.74rem);
+    font-size: clamp(0.65rem, 0.78vw, 0.76rem);
     letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 10px;
+    color: var(--text-muted); margin-bottom: 12px;
 }
 .hero-rating-row {
-    display: flex; align-items: center; gap: 10px;
-    font-size: clamp(0.85rem, 1vw, 1rem);
-    color: var(--text-muted); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: clamp(0.88rem, 1.05vw, 1.05rem);
+    color: var(--text-muted); margin-bottom: 16px;
 }
-.hero-rating-row .hstar { color: #f5c518; font-size: clamp(0.9rem, 1.1vw, 1.1rem); }
-.hero-rating-row strong {
-    color: var(--beige);
-    font-size: clamp(1rem, 1.2vw, 1.2rem);
-    font-weight: 700;
-}
+.hero-rating-row .hstar { color: #f5c518; font-size: clamp(0.95rem, 1.15vw, 1.15rem); }
+.hero-rating-row strong { color: var(--beige); font-size: clamp(1.05rem, 1.25vw, 1.25rem); font-weight: 700; }
 .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 3.5vw, 4rem);
+    font-size: clamp(2.2rem, 4vw, 4.6rem);
     font-weight: 700; color: #fff;
-    letter-spacing: 1px; line-height: 1.08;
-    margin-bottom: 16px;
+    letter-spacing: 1px; line-height: 1.07;
+    margin-bottom: 18px;
 }
 .hero-desc {
-    font-size: clamp(0.88rem, 1.05vw, 1rem);
+    font-size: clamp(0.9rem, 1.08vw, 1.05rem);
     color: var(--text-muted);
-    line-height: 1.75; margin-bottom: 28px;
-    max-width: 420px;
+    line-height: 1.8; margin-bottom: 32px;
+    max-width: 440px;
 }
-.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
 .btn-watch-hero {
-    display: inline-flex; align-items: center; gap: 9px;
+    display: inline-flex; align-items: center; gap: 10px;
     background: #e50914; color: #fff; border: none;
-    padding: clamp(12px,1.2vw,15px) clamp(24px,2.4vw,34px);
+    padding: clamp(13px,1.3vw,16px) clamp(26px,2.6vw,38px);
     border-radius: 6px;
     font-family: 'DM Sans', sans-serif;
-    font-size: clamp(0.86rem, 1vw, 1rem); font-weight: 700;
+    font-size: clamp(0.88rem, 1.05vw, 1.05rem); font-weight: 700;
     cursor: pointer; letter-spacing: 0.5px;
     text-decoration: none; transition: background .2s, transform .15s;
 }
 .btn-watch-hero:hover { background: #c1070f; transform: translateY(-2px); }
 .btn-addlist-hero {
-    display: inline-flex; align-items: center; gap: 9px;
+    display: inline-flex; align-items: center; gap: 10px;
     background: rgba(131,153,88,0.1); color: var(--accent);
     border: 1.5px solid var(--accent);
-    padding: clamp(12px,1.2vw,15px) clamp(20px,2vw,28px);
+    padding: clamp(13px,1.3vw,16px) clamp(22px,2.2vw,30px);
     border-radius: 6px; font-family: 'DM Sans', sans-serif;
-    font-size: clamp(0.86rem, 1vw, 1rem); font-weight: 600;
+    font-size: clamp(0.88rem, 1.05vw, 1.05rem); font-weight: 600;
     cursor: pointer; text-decoration: none;
     transition: all .2s;
 }
 .btn-addlist-hero:hover { background: rgba(131,153,88,0.22); transform: translateY(-2px); }
 .hero-dots {
-    position: absolute; bottom: 20px; left: clamp(32px, 5vw, 72px);
-    display: flex; gap: 8px; z-index: 5;
+    position: absolute; bottom: 24px; left: clamp(40px, 5.5vw, 84px);
+    display: flex; gap: 9px; z-index: 5;
 }
 .hero-dot {
-    width: 28px; height: 3px; border-radius: 2px;
+    width: 32px; height: 3px; border-radius: 2px;
     background: rgba(247,244,213,0.18); cursor: pointer;
     transition: background .3s, width .3s;
 }
-.hero-dot.active { background: var(--accent); width: 44px; }
+.hero-dot.active { background: var(--accent); width: 50px; }
+
+/* ══ STATS BAR ══ */
+.stats-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: center;
+}
+.stat-item {
+    flex: 1; max-width: 280px; text-align: center;
+    padding: 32px 24px; border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem; font-weight: 700; color: var(--accent);
+}
+.stat-lbl {
+    font-size: 0.76rem; color: var(--text-muted);
+    letter-spacing: 1.6px; text-transform: uppercase; margin-top: 6px;
+}
 
 /* ══ SECTION WRAPPER ══ */
-.sec { padding: 36px 56px 0; }
-.sec-last { padding-bottom: 48px; }
-
-/* ══ SECTION HEAD ══ */
+.sec { padding: 44px 64px 0; }
+.sec-last { padding-bottom: 56px; }
 .sec-head {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 .sec-title {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 12px;
     font-family: 'Playfair Display', serif;
-    font-size: 1.4rem; font-weight: 700; color: var(--beige);
+    font-size: 1.55rem; font-weight: 700; color: var(--beige);
 }
-.sec-tabs { display: flex; gap: 26px; }
+.sec-tabs { display: flex; gap: 28px; }
 .sec-tab {
-    font-size: 0.84rem; color: var(--text-muted);
-    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    font-size: 0.86rem; color: var(--text-muted);
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
     padding-bottom: 3px; border-bottom: 2px solid transparent;
     transition: all .2s; user-select: none;
 }
@@ -214,14 +209,13 @@ body > main + footer { display: none; }
 
 /* ══ GENRE PILLS ══ */
 .gpills {
-    display: flex; gap: 10px; margin-bottom: 22px;
-    overflow-x: auto; scrollbar-width: none;
-    padding-bottom: 2px;
+    display: flex; gap: 10px; margin-bottom: 24px;
+    overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
 }
 .gpills::-webkit-scrollbar { display: none; }
 .gpill {
-    flex-shrink: 0; padding: 7px 20px; border-radius: 24px;
-    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;
+    flex-shrink: 0; padding: 8px 22px; border-radius: 26px;
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.3px;
     background: transparent; color: var(--text-dim);
     border: 1px solid var(--border); cursor: pointer;
     transition: all .2s; white-space: nowrap;
@@ -235,83 +229,187 @@ body > main + footer { display: none; }
 /* ══ FILM SCROLL ROW ══ */
 .fscroll-wrap { position: relative; }
 .fscroll {
-    display: flex; gap: 18px; overflow-x: auto;
-    padding-bottom: 10px; scroll-snap-type: x mandatory;
+    display: flex; gap: 20px; overflow-x: auto;
+    padding-bottom: 12px; scroll-snap-type: x mandatory;
     scrollbar-width: none;
 }
 .fscroll::-webkit-scrollbar { display: none; }
 
-/* ══ FILM CARD ══ */
+/* ══ FILM CARD — Ukuran Lebih Besar ══ */
 .fcard {
-    flex: 0 0 200px; scroll-snap-align: start;
+    flex: 0 0 220px; scroll-snap-align: start;
     cursor: pointer; text-decoration: none;
     transition: transform .25s;
 }
-.fcard:hover { transform: translateY(-5px); }
+.fcard:hover { transform: translateY(-6px); }
 .fcard-poster {
-    width: 200px; height: 290px; border-radius: 10px;
+    width: 220px; height: 320px; border-radius: 11px;
     background: var(--surface); border: 1px solid var(--border);
     overflow: hidden; position: relative;
     transition: border-color .25s, box-shadow .25s;
 }
 .fcard:hover .fcard-poster {
     border-color: var(--border-strong);
-    box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
 }
 .fcard-poster img {
     width: 100%; height: 100%; object-fit: cover;
     transition: transform .3s;
 }
-.fcard:hover .fcard-poster img { transform: scale(1.05); }
+.fcard:hover .fcard-poster img { transform: scale(1.06); }
 .fcard-init {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem; color: rgba(247,244,213,0.1);
+    font-size: 4rem; color: rgba(247,244,213,0.08);
     pointer-events: none;
 }
 .fcard-badge {
-    position: absolute; bottom: 8px; right: 9px;
-    background: rgba(9,30,20,0.88); color: var(--accent);
+    position: absolute; bottom: 9px; right: 10px;
+    background: rgba(9,30,20,0.9); color: var(--accent);
+    font-size: 0.74rem; font-weight: 700;
+    padding: 5px 11px; border-radius: 22px;
+    border: 1px solid rgba(131,153,88,0.3);
+}
+.fcard-title {
+    font-size: 0.95rem; font-weight: 600; color: var(--text);
+    margin-top: 12px; line-height: 1.35;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 220px;
+}
+.fcard-year { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+.fcard-meta {
+    display: flex; align-items: center; gap: 6px; margin-top: 5px;
+}
+.fcard-meta .ico { color: var(--rosy-brown); font-size: 0.74rem; }
+.fcard-meta span { font-size: 0.8rem; color: var(--text-muted); }
+.fcard-genres {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(9,30,20,0.93);
+    padding: 12px 10px 8px;
+    transform: translateY(100%);
+    transition: transform .25s;
+    display: flex; flex-wrap: wrap; gap: 5px;
+}
+.fcard:hover .fcard-genres { transform: translateY(0); }
+.fcard-genres .gchip {
+    font-size: 0.62rem; font-weight: 600; padding: 3px 8px; border-radius: 11px;
+    background: rgba(131,153,88,0.2); color: var(--accent);
+    border: 1px solid rgba(131,153,88,0.25);
+}
+
+/* ══ FILM CARD — Ukuran XL untuk section Featured ══ */
+.fcard-xl {
+    flex: 0 0 260px; scroll-snap-align: start;
+    cursor: pointer; text-decoration: none;
+    transition: transform .25s;
+}
+.fcard-xl:hover { transform: translateY(-7px); }
+.fcard-xl .fcard-poster {
+    width: 260px; height: 380px; border-radius: 13px;
+}
+.fcard-xl .fcard-title { font-size: 1rem; max-width: 260px; }
+.fcard-xl .fcard-badge { font-size: 0.78rem; padding: 6px 13px; }
+.fcard-xl .fcard-init { font-size: 5rem; }
+
+/* ══ FILM GRID untuk "Semua Film" ══ */
+.fgrid-section { margin-top: 48px; border-top: 1px solid var(--border); padding-top: 44px; }
+.fgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px 20px;
+}
+.fgrid-card {
+    cursor: pointer; text-decoration: none;
+    transition: transform .25s;
+}
+.fgrid-card:hover { transform: translateY(-5px); }
+.fgrid-poster {
+    width: 100%; aspect-ratio: 2/3; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    overflow: hidden; position: relative;
+    transition: border-color .25s, box-shadow .25s;
+}
+.fgrid-card:hover .fgrid-poster {
+    border-color: var(--border-strong);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+}
+.fgrid-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.fgrid-card:hover .fgrid-poster img { transform: scale(1.05); }
+.fgrid-badge {
+    position: absolute; bottom: 9px; right: 10px;
+    background: rgba(9,30,20,0.9); color: var(--accent);
     font-size: 0.72rem; font-weight: 700;
     padding: 4px 10px; border-radius: 20px;
     border: 1px solid rgba(131,153,88,0.3);
 }
-.fcard-title {
-    font-size: 0.92rem; font-weight: 600; color: var(--text);
+.fgrid-init {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.8rem; color: rgba(247,244,213,0.08);
+    pointer-events: none;
+}
+.fgrid-title {
+    font-size: 0.9rem; font-weight: 600; color: var(--text);
     margin-top: 10px; line-height: 1.35;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    max-width: 200px;
 }
-.fcard-year { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
-.fcard-meta {
-    display: flex; align-items: center; gap: 5px; margin-top: 5px;
-}
-.fcard-meta .ico { color: var(--rosy-brown); font-size: 0.72rem; }
-.fcard-meta span { font-size: 0.78rem; color: var(--text-muted); }
+.fgrid-year { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+.fgrid-meta { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+.fgrid-meta .ico { color: var(--rosy-brown); font-size: 0.72rem; }
+.fgrid-meta span { font-size: 0.78rem; color: var(--text-muted); }
 
-/* ══ MOVIES DIVIDER SECTION ══ */
-.movies-section {
-    margin-top: 44px;
-    border-top: 1px solid var(--border);
-    padding-top: 36px;
+/* ══ GENRE SPOTLIGHT SECTION ══ */
+.genre-spotlight {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px; margin-top: 8px;
+}
+.genre-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 26px 22px;
+    text-decoration: none; display: block;
+    transition: all .25s; cursor: pointer;
+    position: relative; overflow: hidden;
+}
+.genre-card::before {
+    content: ''; position: absolute;
+    inset: 0; opacity: 0; transition: opacity .25s;
+}
+.genre-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.35);
+}
+.genre-card:hover::before { opacity: 1; }
+.genre-card-icon { font-size: 2.2rem; margin-bottom: 12px; display: block; }
+.genre-card-name { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.genre-card-count { font-size: 0.78rem; color: var(--text-muted); }
+.genre-card-bar {
+    height: 3px; background: var(--border); border-radius: 2px;
+    margin-top: 14px; overflow: hidden;
+}
+.genre-card-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    transition: width .4s ease;
 }
 
 /* ══ SORT BAR ══ */
 .sort-bar {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 .sort-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.sort-lbl { font-size: 0.82rem; color: var(--text-muted); }
+.sort-lbl { font-size: 0.84rem; color: var(--text-muted); }
 .sort-active {
-    padding: 8px 20px; border-radius: 24px;
-    font-size: 0.8rem; font-weight: 700;
+    padding: 8px 22px; border-radius: 26px;
+    font-size: 0.82rem; font-weight: 700;
     background: var(--accent); color: var(--bg); border: none; cursor: pointer;
     font-family: 'DM Sans', sans-serif;
 }
 .sort-sel {
-    padding: 7px 16px; border-radius: 24px; font-size: 0.8rem;
+    padding: 8px 16px; border-radius: 26px; font-size: 0.82rem;
     background: transparent; color: var(--text-dim);
     border: 1px solid var(--border); outline: none; cursor: pointer;
     font-family: 'DM Sans', sans-serif;
@@ -321,36 +419,31 @@ body > main + footer { display: none; }
 .rating-right { display: flex; align-items: center; gap: 10px; }
 .rating-right .rstar { color: #f5c518; font-size: 1rem; }
 .rslider {
-    -webkit-appearance: none; width: 120px; height: 3px;
+    -webkit-appearance: none; width: 130px; height: 3px;
     background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
 }
 .rslider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 15px; height: 15px;
+    -webkit-appearance: none; width: 16px; height: 16px;
     border-radius: 50%; background: var(--accent); cursor: pointer;
 }
-.rval { font-size: 0.8rem; color: var(--text-muted); min-width: 36px; }
+.rval { font-size: 0.82rem; color: var(--text-muted); min-width: 40px; }
 
-/* ══ SCROLL WITH ARROWS ══ */
-.arrow-wrap {
-    display: flex; align-items: center; gap: 14px;
-}
+/* ══ SCROLL ARROWS ══ */
+.arrow-wrap { display: flex; align-items: center; gap: 16px; }
 .sarrow {
-    flex-shrink: 0; width: 36px; height: 150px;
+    flex-shrink: 0; width: 38px; height: 160px;
     background: rgba(131,153,88,0.07); border: 1px solid var(--border);
-    border-radius: 7px; display: flex; align-items: center; justify-content: center;
-    color: var(--accent); cursor: pointer; font-size: 1.4rem;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: var(--accent); cursor: pointer; font-size: 1.5rem;
     transition: all .2s; user-select: none; align-self: center;
 }
 .sarrow:hover { background: rgba(131,153,88,0.18); border-color: var(--border-strong); }
 
 /* ══ QUERY CARDS ══ */
-.qgrid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
-    margin-top: 22px;
-}
+.qgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
 .qcard {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 13px; padding: 22px 26px;
+    border-radius: 14px; padding: 24px 28px;
     text-decoration: none; display: block;
     transition: all .25s; cursor: pointer;
 }
@@ -358,145 +451,127 @@ body > main + footer { display: none; }
     border-color: var(--border-strong);
     background: var(--surface2);
     transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.32);
 }
-.qcard-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.qcard-q { color: var(--text-muted); font-size: 0.84rem; font-style: italic; line-height: 1.6; }
+.qcard-title { font-size: 1.04rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.qcard-q { color: var(--text-muted); font-size: 0.86rem; font-style: italic; line-height: 1.65; }
 
-/* ══ STATS BAR ══ */
-.stats-bar {
-    background: var(--surface); border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: center;
+/* ══ TOP RATED BANNER LIST ══ */
+.toprated-list { display: flex; flex-direction: column; gap: 14px; }
+.toprated-item {
+    display: flex; align-items: center; gap: 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 20px;
+    text-decoration: none; transition: all .22s;
 }
-.stat-item {
-    flex: 1; max-width: 240px; text-align: center;
-    padding: 28px 20px; border-right: 1px solid var(--border);
+.toprated-item:hover {
+    border-color: var(--border-strong);
+    transform: translateX(4px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.28);
 }
-.stat-item:last-child { border-right: none; }
-.stat-val {
+.toprated-rank {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem; font-weight: 700; color: var(--accent);
+    font-size: 1.8rem; font-weight: 700; color: rgba(131,153,88,0.28);
+    min-width: 42px; text-align: center;
 }
-.stat-lbl {
-    font-size: 0.74rem; color: var(--text-muted);
-    letter-spacing: 1.4px; text-transform: uppercase; margin-top: 5px;
+.toprated-poster {
+    width: 52px; height: 76px; border-radius: 7px;
+    overflow: hidden; flex-shrink: 0; background: var(--surface);
+}
+.toprated-poster img { width: 100%; height: 100%; object-fit: cover; }
+.toprated-info { flex: 1; min-width: 0; }
+.toprated-title {
+    font-size: 0.96rem; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.toprated-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+.toprated-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--accent);
+}
+
+/* ══ DUAL COLUMN LAYOUT ══ */
+.dual-col {
+    display: grid; grid-template-columns: 1fr 380px; gap: 36px;
+    align-items: start;
 }
 
 /* ══ NF FOOTER ══ */
 .nf-footer {
     background: var(--surface); border-top: 1px solid var(--border);
-    padding: 36px 56px 22px; margin-top: 56px;
+    padding: 44px 64px 24px; margin-top: 64px;
 }
 .nf-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr) 1.8fr;
-    gap: 32px; margin-bottom: 28px;
+    display: grid; grid-template-columns: repeat(4, 1fr) 2fr;
+    gap: 36px; margin-bottom: 32px;
 }
 .nf-col h4 {
-    font-size: 0.86rem; font-weight: 700; color: var(--accent);
-    margin-bottom: 14px; letter-spacing: 0.5px;
+    font-size: 0.88rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 16px; letter-spacing: 0.5px;
 }
 .nf-col a, .nf-col p {
-    display: block; font-size: 0.78rem; color: var(--text-muted);
-    line-height: 2.2; text-decoration: none; transition: color .2s;
+    display: block; font-size: 0.8rem; color: var(--text-muted);
+    line-height: 2.3; text-decoration: none; transition: color .2s;
 }
 .nf-col a:hover { color: var(--accent); }
 .nf-news {
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 20px;
+    border-radius: 11px; padding: 22px;
 }
-.nf-news strong { display: block; font-size: 0.9rem; color: var(--beige); margin-bottom: 7px; }
-.nf-news p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.7; }
-.nf-form { display: flex; gap: 8px; margin-top: 14px; }
+.nf-news strong { display: block; font-size: 0.92rem; color: var(--beige); margin-bottom: 8px; }
+.nf-news p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
+.nf-form { display: flex; gap: 9px; margin-top: 16px; }
 .nf-form input {
     flex: 1; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 6px; padding: 10px 14px; color: var(--text);
-    font-size: 0.78rem; outline: none; font-family: 'DM Sans', sans-serif;
+    border-radius: 7px; padding: 11px 14px; color: var(--text);
+    font-size: 0.8rem; outline: none; font-family: 'DM Sans', sans-serif;
     transition: border-color .2s;
 }
 .nf-form input:focus { border-color: var(--accent); }
 .nf-form button {
     background: var(--accent); color: var(--bg); border: none;
-    border-radius: 6px; padding: 10px 18px;
-    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    border-radius: 7px; padding: 11px 20px;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer;
     font-family: 'DM Sans', sans-serif; transition: background .2s;
 }
 .nf-form button:hover { background: #6e8245; }
 .nf-copy {
-    border-top: 1px solid var(--border); padding-top: 16px;
-    font-size: 0.67rem; color: var(--text-muted); text-align: center;
+    border-top: 1px solid var(--border); padding-top: 18px;
+    font-size: 0.68rem; color: var(--text-muted); text-align: center;
 }
 
-/* ══ RESPONSIVE ══ */
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
     .hero-left { flex: 0 0 50%; }
-    .hero-poster-thumb { width: clamp(72px, 7.5vw, 110px); }
+    .genre-spotlight { grid-template-columns: repeat(3, 1fr); }
+    .dual-col { grid-template-columns: 1fr; }
+    .fgrid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
-@media (max-width: 960px) {
-    .hero-left { flex: 0 0 56%; }
+@media (max-width: 1000px) {
+    .sec { padding: 36px 32px 0; }
     .hero-poster-previews { display: none; }
-    .hero-poster-main {
-        height: calc((100vh - 52px) * 0.78);
-        width: calc(((100vh - 52px) * 0.78) * 0.67);
-    }
+    .genre-spotlight { grid-template-columns: repeat(2, 1fr); }
+    .qgrid { grid-template-columns: repeat(2, 1fr); }
+    .nf-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 720px) {
-    .hero-section {
-        height: auto;
-        min-height: unset;
-        max-height: unset;
-        flex-direction: column;
-        padding-bottom: 48px;
-    }
-    .hero-left {
-        flex: none;
-        padding: 40px 28px 24px;
-        background: var(--bg);
-    }
-    .hero-right {
-        flex: none;
-        justify-content: center;
-        padding: 0 28px 20px;
-        background: var(--bg);
-    }
+    .hero-section { height: auto; min-height: unset; max-height: unset; flex-direction: column; padding-bottom: 48px; }
+    .hero-left { flex: none; padding: 40px 28px 24px; }
+    .hero-right { flex: none; justify-content: center; padding: 0 28px 20px; }
     .hero-right::before { display: none; }
-    .hero-poster-main {
-        height: 52vw;
-        width: calc(52vw * 0.67);
-        min-height: 200px;
-        min-width: 134px;
-        max-height: 320px;
-        max-width: 214px;
-    }
-    .hero-poster-previews { display: none; }
-    .hero-dots { left: 28px; bottom: 12px; }
-    .hero-title { font-size: clamp(1.7rem, 6vw, 2.4rem); }
-}
-
-/* ══ HOVER TOOLTIP GENRE ══ */
-.fcard-genres {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: rgba(9,30,20,0.92);
-    padding: 10px 10px 6px;
-    transform: translateY(100%);
-    transition: transform .25s;
-    display: flex; flex-wrap: wrap; gap: 4px;
-}
-.fcard:hover .fcard-genres { transform: translateY(0); }
-.fcard-genres .gchip {
-    font-size: 0.6rem; font-weight: 600; padding: 2px 7px; border-radius: 10px;
-    background: rgba(131,153,88,0.2); color: var(--accent);
-    border: 1px solid rgba(131,153,88,0.25);
+    .hero-poster-main { height: 56vw; width: calc(56vw * 0.67); min-height: 200px; min-width: 134px; max-height: 340px; max-width: 228px; }
+    .genre-spotlight { grid-template-columns: 1fr 1fr; }
+    .qgrid { grid-template-columns: 1fr; }
+    .fgrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
 </style>
 {% endblock %}
 
 {% block content %}
+{# Fallback: jika app.py belum mengirim film_semua, gunakan film_populer #}
+{% if film_semua is not defined %}{% set film_semua = film_populer %}{% endif %}
 
 <!-- ══ HERO ══════════════════════════════════════════════════════ -->
 <div class="hero-section" id="heroSection">
-
-    <!-- Kiri: info film + tombol -->
     <div class="hero-left">
         <div class="hero-content" id="heroContent" style="opacity:0;transition:opacity .35s;">
             <div class="hero-meta-tag" id="heroMeta"></div>
@@ -514,8 +589,6 @@ body > main + footer { display: none; }
             </div>
         </div>
     </div>
-
-    <!-- Kanan: poster utama + thumbnail preview -->
     <div class="hero-right">
         <div class="hero-poster-main" id="heroPosterMain">
             <img id="heroBgImg" src="" alt="">
@@ -531,8 +604,6 @@ body > main + footer { display: none; }
             {% endfor %}
         </div>
     </div>
-
-    <!-- Dots navigasi -->
     <div class="hero-dots" id="heroDots">
         {% for film in film_populer[:4] %}
         <div class="hero-dot {% if loop.first %}active{% endif %}"
@@ -552,10 +623,10 @@ body > main + footer { display: none; }
 </div>
 
 <!-- ══ TRENDS NOW ════════════════════════════════════════════════ -->
-<div class="sec" style="padding-top:32px;">
+<div class="sec" style="padding-top:40px;">
     <div class="sec-head">
         <div class="sec-title">
-            <span style="font-size:1.15rem;">↗</span> Trends Now
+            <span style="font-size:1.2rem;">↗</span> Trends Now
         </div>
         <div class="sec-tabs">
             <span class="sec-tab" onclick="setTab(this,'trends')">🔥 Populer</span>
@@ -565,24 +636,23 @@ body > main + footer { display: none; }
     </div>
 
     <div class="gpills" id="trendsGenrePills">
-        <a href="/cari" class="gpill act-red">Semua</a>
+        <span class="gpill act-red" data-target="trendsScroll" data-genre="">Semua</span>
         {% for g in genres %}
-        <a href="/cari?genre={{ g }}" class="gpill {% if loop.index == 4 %}act-green{% elif loop.index == 7 %}act-green{% endif %}">{{ g }}</a>
+        <span class="gpill" data-target="trendsScroll" data-genre="{{ g }}">{{ g }}</span>
         {% endfor %}
     </div>
 
     <div class="fscroll-wrap">
         <div class="fscroll" id="trendsScroll">
-            {% for film in film_populer %}
+            {% for film in film_semua %}
             {% set gl = film.genre.split(',') if film.genre else [] %}
-            <a href="/detail/{{ film.id }}" class="fcard">
+            <a href="/detail/{{ film.id }}" class="fcard"
+               data-genre="{{ film.genre or '' }}">
                 <div class="fcard-poster">
                     {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
                     <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
                     <div class="fcard-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
-                    <div class="fcard-genres">
-                        {% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}
-                    </div>
+                    <div class="fcard-genres">{% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}</div>
                 </div>
                 <div class="fcard-title" title="{{ film.judul }}">{{ film.judul }}</div>
                 <div class="fcard-year">{{ film.tahun }}</div>
@@ -596,8 +666,63 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ SEMUA FILM ════════════════════════════════════════════════ -->
-<div class="sec movies-section">
+<!-- ══ FEATURED / PILIHAN EDITOR (XL Cards) ════════════════════ -->
+<div class="sec" style="padding-top:44px;">
+    <div class="sec-head">
+        <div class="sec-title">
+            <span style="color:#f5c518;">★</span> Pilihan Editor
+        </div>
+        <a href="/cari" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Lihat semua →</a>
+    </div>
+    <div class="fscroll-wrap">
+        <div class="fscroll" id="featuredScroll">
+            {% for film in film_semua | sort(attribute='rating', reverse=True) %}
+            {% set gl = film.genre.split(',') if film.genre else [] %}
+            <a href="/detail/{{ film.id }}" class="fcard fcard-xl"
+               data-genre="{{ film.genre or '' }}">
+                <div class="fcard-poster">
+                    {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
+                    <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
+                    <div class="fcard-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
+                    <div class="fcard-genres">{% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}</div>
+                </div>
+                <div class="fcard-title" title="{{ film.judul }}">{{ film.judul }}</div>
+                <div class="fcard-year">{{ film.tahun }}</div>
+                <div class="fcard-meta">
+                    <span class="ico">♥</span><span class="ico">👁</span>
+                    <span>{{ "%.1f"|format(film.rating|float) }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- ══ GENRE SPOTLIGHT ═══════════════════════════════════════════ -->
+<div class="sec" style="padding-top:48px;">
+    <div class="sec-head">
+        <div class="sec-title">
+            <span>🎭</span> Jelajahi Genre
+        </div>
+        <a href="/cari" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Semua genre →</a>
+    </div>
+    <div class="genre-spotlight">
+        {% set genre_icons = {'Aksi':'⚔️','Animasi':'✨','Barat':'🤠','Drama':'🎭','Fantasi':'🧙','Horor':'👻','Komedi':'😄','Kengerian':'💀','Kejahatan':'🔪','Keluarga':'👨‍👩‍👧','Misteri':'🔍','Musik':'🎵','Percintaan':'💕','Petualangan':'🗺️','Sejarah':'📜','Fiksi':'🚀','Dokumenter':'📽️','Thriller':'😱'} %}
+        {% for g in genres[:8] %}
+        <a href="/cari?genre={{ g }}" class="genre-card">
+            <span class="genre-card-icon">{{ genre_icons.get(g, '🎬') }}</span>
+            <div class="genre-card-name">{{ g }}</div>
+            <div class="genre-card-count">Jelajahi film {{ g|lower }}</div>
+            <div class="genre-card-bar">
+                <div class="genre-card-bar-fill" style="width: {{ (loop.index * 13) % 80 + 20 }}%;"></div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ══ SEMUA FILM + TOP RATED (Dual Column) ══════════════════════ -->
+<div class="sec fgrid-section">
     <div class="sec-head">
         <div class="sec-title">
             <span>🎬</span> Semua Film
@@ -605,14 +730,14 @@ body > main + footer { display: none; }
         <div class="sec-tabs">
             <span class="sec-tab active">✓ Film Populer</span>
             <span class="sec-tab">▷ Berdasarkan Genre</span>
-            <a href="/cari" style="font-size:0.78rem;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:5px;padding-bottom:3px;">🔍 Cari Film</a>
+            <a href="/cari" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:5px;padding-bottom:3px;">🔍 Cari Film</a>
         </div>
     </div>
 
-    <div class="gpills">
-        <a href="/cari" class="gpill act-red">Semua</a>
+    <div class="gpills" id="moviesGenrePills">
+        <span class="gpill act-red" data-target="moviesGrid" data-genre="">Semua</span>
         {% for g in genres %}
-        <a href="/cari?genre={{ g }}" class="gpill {% if loop.index == 4 %}act-green{% elif loop.index == 8 %}act-green{% endif %}">{{ g }}</a>
+        <span class="gpill" data-target="moviesGrid" data-genre="{{ g }}">{{ g }}</span>
         {% endfor %}
     </div>
 
@@ -623,10 +748,8 @@ body > main + footer { display: none; }
             <select class="sort-sel" id="sortYear" onchange="applySortMovies()">
                 <option value="">Tahun ∨</option>
                 {% set years = [] %}
-                {% for f in film_populer %}
-                  {% if f.tahun and f.tahun|string not in years %}
-                    {% set _ = years.append(f.tahun|string) %}
-                  {% endif %}
+                {% for f in film_semua %}
+                  {% if f.tahun and f.tahun|string not in years %}{% set _ = years.append(f.tahun|string) %}{% endif %}
                 {% endfor %}
                 {% for y in years|sort(reverse=True) %}
                 <option value="{{ y }}">{{ y }}</option>
@@ -644,43 +767,69 @@ body > main + footer { display: none; }
         </div>
     </div>
 
-    <div class="arrow-wrap">
-        <div class="sarrow" onclick="scrollMs(-1)">‹</div>
-        <div class="fscroll" id="moviesScroll" style="flex:1;">
-            {% for film in film_populer %}
-            {% set gl = film.genre.split(',') if film.genre else [] %}
-            <a href="/detail/{{ film.id }}" class="fcard"
-               data-title="{{ film.judul }}"
-               data-year="{{ film.tahun }}"
-               data-rating="{{ film.rating|float }}">
-                <div class="fcard-poster">
-                    {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
-                    <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
-                    <div class="fcard-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
-                    <div class="fcard-genres">
-                        {% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}
+    <div class="dual-col">
+        <!-- Kiri: Grid Film — semua dari database -->
+        <div>
+            <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;" id="gridCount"></div>
+            <div class="fgrid" id="moviesGrid">
+                {% for film in film_semua %}
+                {% set gl = film.genre.split(',') if film.genre else [] %}
+                <a href="/detail/{{ film.id }}" class="fgrid-card"
+                   data-title="{{ film.judul }}"
+                   data-year="{{ film.tahun }}"
+                   data-rating="{{ film.rating|float }}"
+                   data-genre="{{ film.genre or '' }}">
+                    <div class="fgrid-poster">
+                        {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
+                        <div class="fgrid-init">{{ film.judul[:2]|upper }}</div>
+                        <div class="fgrid-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
                     </div>
-                </div>
-                <div class="fcard-title" title="{{ film.judul }}">{{ film.judul }}</div>
-                <div class="fcard-year">{{ film.tahun }}</div>
-                <div class="fcard-meta">
-                    <span class="ico">♥</span><span class="ico">👁</span>
-                    <span>{{ "%.1f"|format(film.rating|float) }}</span>
-                </div>
-            </a>
-            {% endfor %}
+                    <div class="fgrid-title" title="{{ film.judul }}">{{ film.judul }}</div>
+                    <div class="fgrid-year">{{ film.tahun }}</div>
+                    <div class="fgrid-meta">
+                        <span class="ico">♥</span><span class="ico">👁</span>
+                        <span>{{ "%.1f"|format(film.rating|float) }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
         </div>
-        <div class="sarrow" onclick="scrollMs(1)">›</div>
+
+        <!-- Kanan: Top Rated Sidebar — 15 teratas -->
+        <div>
+            <div style="margin-bottom:22px;">
+                <div class="sec-title" style="font-size:1.2rem;margin-bottom:16px;">
+                    <span style="color:#f5c518;">🏆</span> Top Rating
+                </div>
+                <div class="toprated-list">
+                    {% for film in film_semua | sort(attribute='rating', reverse=True) | list %}
+                    {% if loop.index <= 15 %}
+                    <a href="/detail/{{ film.id }}" class="toprated-item">
+                        <div class="toprated-rank">{{ loop.index }}</div>
+                        <div class="toprated-poster">
+                            {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.background='var(--surface)'">{% endif %}
+                        </div>
+                        <div class="toprated-info">
+                            <div class="toprated-title">{{ film.judul }}</div>
+                            <div class="toprated-meta">{{ film.tahun }} · {{ film.genre.split(',')[0] if film.genre else 'Film' }}</div>
+                        </div>
+                        <div class="toprated-score">{{ "%.1f"|format(film.rating|float) }}</div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- ══ COBA QUERY ════════════════════════════════════════════════ -->
-<div class="sec sec-last" style="margin-top:36px;">
+<div class="sec sec-last" style="margin-top:48px;">
     <div class="sec-head">
         <div class="sec-title">
             <span style="color:var(--rosy-brown);">✦</span> Coba Query Ini
         </div>
-        <a href="/cari" style="font-size:0.78rem;color:var(--accent);text-decoration:none;">Lihat semua →</a>
+        <a href="/cari" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Lihat semua →</a>
     </div>
     <div class="qgrid">
         {% set contoh = [
@@ -743,9 +892,7 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ JAVASCRIPT INTERAKTIF ══════════════════════════════════════ -->
 <script>
-// ── Data film dari Jinja ──────────────────────────────────────────
 const FILMS_DATA = [
     {% for film in film_populer %}
     {
@@ -760,142 +907,146 @@ const FILMS_DATA = [
     {% endfor %}
 ];
 
-// ── HERO SLIDESHOW ────────────────────────────────────────────────
-let heroIdx = 0;
-let heroTimer = null;
+// ── HERO SLIDESHOW ─────────────────────────────────────────────
+let heroIdx = 0, heroTimer = null;
 
 function setHeroSlide(idx) {
     if (idx < 0 || idx >= FILMS_DATA.length) return;
     heroIdx = idx;
     const f = FILMS_DATA[idx];
     const genres = f.genre ? f.genre.split(',') : [];
-
-    // Swap poster kanan dengan fade
     const bgImg = document.getElementById('heroBgImg');
     if (f.poster_url) {
         const tmp = new Image();
-        tmp.onload = function() {
-            bgImg.classList.add('fade-out');
-            setTimeout(() => {
-                bgImg.src = f.poster_url;
-                bgImg.classList.remove('fade-out');
-            }, 200);
-        };
-        tmp.onerror = function() {
-            bgImg.src = '';
-        };
+        tmp.onload = () => { bgImg.classList.add('fade-out'); setTimeout(() => { bgImg.src = f.poster_url; bgImg.classList.remove('fade-out'); }, 200); };
+        tmp.onerror = () => { bgImg.src = ''; };
         tmp.src = f.poster_url;
-    } else {
-        bgImg.src = '';
-    }
-
-    // Update teks kiri
-    document.getElementById('heroMeta').textContent =
-        (genres[0] ? genres[0].trim() : 'Film') + '  ·  ' + (f.tahun || '');
-    document.getElementById('heroRating').textContent =
-        f.rating ? f.rating.toFixed(1) : '-';
+    } else { bgImg.src = ''; }
+    document.getElementById('heroMeta').textContent = (genres[0] ? genres[0].trim() : 'Film') + '  ·  ' + (f.tahun || '');
+    document.getElementById('heroRating').textContent = f.rating ? f.rating.toFixed(1) : '-';
     document.getElementById('heroYear2').textContent = f.tahun || '';
     document.getElementById('heroTitle').textContent = f.judul.toUpperCase();
-    document.getElementById('heroDesc').textContent =
-        f.sinopsis ? f.sinopsis.substring(0, 140) + '...' : 'Film populer pilihan CineFind.';
+    document.getElementById('heroDesc').textContent = f.sinopsis ? f.sinopsis.substring(0, 160) + '...' : 'Film populer pilihan CineFind.';
     document.getElementById('heroLinkWatch').href = '/detail/' + f.id;
     document.getElementById('heroLinkSimilar').href = '/cari?q=' + encodeURIComponent(f.judul);
-
-    // Update dots
-    document.querySelectorAll('.hero-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === idx);
-    });
-
-    // Update thumbnail aktif
-    document.querySelectorAll('.hero-poster-thumb').forEach((t, i) => {
-        t.classList.toggle('active', i === idx);
-    });
-
-    // Fade in konten kiri
+    document.querySelectorAll('.hero-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    document.querySelectorAll('.hero-poster-thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
     const hc = document.getElementById('heroContent');
     hc.style.opacity = '0';
     setTimeout(() => { hc.style.opacity = '1'; }, 250);
 }
 
 function startHeroAuto() {
-    heroTimer = setInterval(() => {
-        const next = (heroIdx + 1) % Math.min(FILMS_DATA.length, 4);
-        setHeroSlide(next);
-    }, 5000);
+    heroTimer = setInterval(() => setHeroSlide((heroIdx + 1) % Math.min(FILMS_DATA.length, 4)), 5500);
 }
-
-// Klik dots juga reset timer
 document.querySelectorAll('.hero-dot').forEach((d, i) => {
-    d.addEventListener('click', () => {
-        clearInterval(heroTimer);
-        setHeroSlide(i);
-        startHeroAuto();
-    });
+    d.addEventListener('click', () => { clearInterval(heroTimer); setHeroSlide(i); startHeroAuto(); });
 });
-
-// Init slide pertama
 setHeroSlide(0);
 startHeroAuto();
 
-// ── SCROLL ARROWS ─────────────────────────────────────────────────
-function scrollMs(dir) {
-    document.getElementById('moviesScroll').scrollBy({ left: dir * 600, behavior: 'smooth' });
+// ── GENRE PILL FILTER (berlaku untuk trends row DAN movies grid) ──
+// Setiap pill punya data-target (id container) dan data-genre
+function filterByGenre(genre, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const items = container.querySelectorAll('[data-genre]');
+    let count = 0;
+    items.forEach(item => {
+        const itemGenres = (item.dataset.genre || '').toLowerCase();
+        const match = !genre || itemGenres.includes(genre.toLowerCase());
+        item.style.display = match ? '' : 'none';
+        if (match) count++;
+    });
+    // Update count label khusus grid
+    const countEl = document.getElementById('gridCount');
+    if (countEl && containerId === 'moviesGrid') {
+        countEl.textContent = genre
+            ? `Menampilkan ${count} film genre "${genre}"`
+            : `Menampilkan ${count} film`;
+    }
 }
 
-// ── RATING SLIDER ─────────────────────────────────────────────────
+document.querySelectorAll('.gpill[data-target]').forEach(pill => {
+    pill.addEventListener('click', function () {
+        const target = this.dataset.target;
+        const genre  = this.dataset.genre;
+        // Update active state hanya dalam gpills yang sama
+        this.closest('.gpills').querySelectorAll('.gpill').forEach(p => p.classList.remove('act-red', 'act-green'));
+        this.classList.add('act-red');
+        filterByGenre(genre, target);
+        // Reset sort/rating jika filter grid
+        if (target === 'moviesGrid') {
+            document.getElementById('sortYear').value = '';
+            document.getElementById('ratingSlider').value = 0;
+            document.getElementById('ratingVal').textContent = 'Semua';
+        }
+    });
+});
+
+// Init count
+const allCards = document.querySelectorAll('#moviesGrid .fgrid-card');
+const countEl = document.getElementById('gridCount');
+if (countEl) countEl.textContent = `Menampilkan ${allCards.length} film`;
+
+// ── RATING SLIDER ─────────────────────────────────────────────
 function updateRating(el) {
     const v = parseFloat(el.value);
-    const lbl = document.getElementById('ratingVal');
-    lbl.textContent = v > 0 ? v.toFixed(1) + '+' : 'Semua';
-
-    const cards = document.querySelectorAll('#moviesScroll .fcard');
-    cards.forEach(card => {
+    document.getElementById('ratingVal').textContent = v > 0 ? v.toFixed(1) + '+' : 'Semua';
+    // Ambil genre aktif saat ini
+    const activePill = document.querySelector('#moviesGenrePills .gpill.act-red');
+    const activeGenre = activePill ? activePill.dataset.genre : '';
+    let count = 0;
+    document.querySelectorAll('#moviesGrid .fgrid-card').forEach(card => {
         const r = parseFloat(card.dataset.rating || 0);
-        card.style.display = (v === 0 || r >= v) ? '' : 'none';
+        const genres = (card.dataset.genre || '').toLowerCase();
+        const matchGenre = !activeGenre || genres.includes(activeGenre.toLowerCase());
+        const matchRating = v === 0 || r >= v;
+        card.style.display = (matchGenre && matchRating) ? '' : 'none';
+        if (matchGenre && matchRating) count++;
     });
+    const countEl = document.getElementById('gridCount');
+    if (countEl) countEl.textContent = `Menampilkan ${count} film` + (activeGenre ? ` genre "${activeGenre}"` : '') + (v > 0 ? ` rating ≥ ${v.toFixed(1)}` : '');
 }
 
-// ── SORT MOVIES ───────────────────────────────────────────────────
+// ── SORT MOVIES ───────────────────────────────────────────────
 function applySortMovies() {
     const yearFilter = document.getElementById('sortYear').value;
     const azVal = document.getElementById('sortAZ').value;
-    const container = document.getElementById('moviesScroll');
-    const cards = Array.from(container.querySelectorAll('.fcard'));
+    const activePill = document.querySelector('#moviesGenrePills .gpill.act-red');
+    const activeGenre = activePill ? activePill.dataset.genre : '';
+    const minRating = parseFloat(document.getElementById('ratingSlider').value) || 0;
+    const container = document.getElementById('moviesGrid');
+    const cards = Array.from(container.querySelectorAll('.fgrid-card'));
 
-    // filter tahun
+    let count = 0;
     cards.forEach(c => {
         const y = c.dataset.year;
-        c.style.display = (!yearFilter || y === yearFilter) ? '' : 'none';
+        const r = parseFloat(c.dataset.rating || 0);
+        const genres = (c.dataset.genre || '').toLowerCase();
+        const matchYear   = !yearFilter || y === yearFilter;
+        const matchRating = minRating === 0 || r >= minRating;
+        const matchGenre  = !activeGenre || genres.includes(activeGenre.toLowerCase());
+        const show = matchYear && matchRating && matchGenre;
+        c.style.display = show ? '' : 'none';
+        if (show) count++;
     });
 
-    // sort A-Z / Z-A
     const visible = cards.filter(c => c.style.display !== 'none');
     visible.sort((a, b) => {
-        const ta = a.dataset.title || '';
-        const tb = b.dataset.title || '';
+        const ta = a.dataset.title || '', tb = b.dataset.title || '';
         return azVal === 'za' ? tb.localeCompare(ta) : ta.localeCompare(tb);
     });
     visible.forEach(c => container.appendChild(c));
+
+    const countEl = document.getElementById('gridCount');
+    if (countEl) countEl.textContent = `Menampilkan ${count} film`;
 }
 
-// ── TAB SWITCH ────────────────────────────────────────────────────
 function setTab(el, group) {
     el.closest('.sec-tabs').querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
 }
-
-// ── GENRE PILL ACTIVE TOGGLE ──────────────────────────────────────
-document.querySelectorAll('.gpill').forEach(pill => {
-    pill.addEventListener('click', function(e) {
-        const parent = this.closest('.gpills');
-        if (parent) {
-            parent.querySelectorAll('.gpill').forEach(p => {
-                p.classList.remove('act-red', 'act-green');
-            });
-            this.classList.add('act-red');
-        }
-    });
-});
 </script>
 
 {% endblock %}

@@ -88,12 +88,28 @@ def enrich_with_poster(film_dict: dict) -> dict:
 
 @app.route("/")
 def beranda():
-    pop = sorted(FILMS, key=lambda f: f.get("popularitas") or f.get("rating") or 0, reverse=True)[:6]
-    film_populer = [enrich_with_poster(f) for f in pop]
-    return render_template("beranda.html",
-                           total=len(FILMS),
-                           genres=GENRES,
-                           film_populer=film_populer)
+    # Semua film, diurutkan popularitas/rating tertinggi
+    all_sorted = sorted(
+        FILMS,
+        key=lambda f: f.get("popularitas") or f.get("rating") or 0,
+        reverse=True
+    )
+ 
+    # 4 film teratas untuk hero slideshow
+    film_hero  = [enrich_with_poster(f) for f in all_sorted[:4]]
+ 
+    # SEMUA film untuk grid, rows, sidebar — tanpa batas
+    film_semua = [enrich_with_poster(f) for f in all_sorted]
+ 
+    return render_template(
+        "beranda.html",
+        total        = len(FILMS),
+        genres       = GENRES,
+        film_populer = film_hero,   # hero + Trends Now (tetap pakai nama lama agar bagian lain tidak rusak)
+        film_semua   = film_semua,  # SEMUA film untuk grid besar
+    )
+ 
+
 
 
 @app.route("/cari")
@@ -105,6 +121,7 @@ def cari():
     error        = None
 
     if query:
+        # ── Mode IR: ada query → jalankan search engine ──
         try:
             hits = ENGINE.search(query, top_k=top_k * 3)
             if filter_genre and filter_genre not in ("semua", ""):
@@ -117,6 +134,19 @@ def cari():
                 hasil.append(row)
         except Exception as e:
             error = f"Error saat pencarian: {str(e)}"
+
+    elif filter_genre and filter_genre not in ("semua", ""):
+        # ── Mode Browse: tidak ada query, tapi ada genre ──
+        # Tampilkan semua film yang punya genre ini, diurutkan rating
+        matched = [
+            f for f in FILMS
+            if filter_genre.lower() in str(f.get("genre", "")).lower()
+        ]
+        matched.sort(key=lambda f: f.get("rating") or 0, reverse=True)
+        for film in matched:
+            row = enrich_with_poster(film)
+            row["skor_relevansi"] = film.get("rating") or 0  # pakai rating sebagai "skor"
+            hasil.append(row)
 
     return render_template("cari.html",
                            query=query,
