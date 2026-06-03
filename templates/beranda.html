@@ -2,119 +2,733 @@
 {% set active = "beranda" %}
 {% block title %}CineFind — Beranda{% endblock %}
 
+{% block head_extra %}
+<style>
+/* hide base footer, override container */
+body > main + footer { display: none; }
+.container { max-width: 100%; padding: 0; }
+
+/* ══ HERO ══════════════════════════════════════════ */
+.hero-section {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    background: var(--bg);
+    display: flex;
+    align-items: flex-end;
+}
+/* full-bleed background poster */
+.hero-bg-img {
+    position: absolute; inset: 0; z-index: 0;
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: center top;
+    transition: opacity .5s ease;
+}
+.hero-bg-img.fade-out { opacity: 0; }
+/* gradient overlay di atas foto */
+.hero-backdrop {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+        linear-gradient(to right, rgba(9,30,20,0.97) 30%, rgba(9,30,20,0.7) 55%, rgba(9,30,20,0.25) 100%),
+        linear-gradient(to top,   rgba(9,30,20,1)    0%,  transparent       40%);
+}
+.hero-content {
+    position: relative; z-index: 3;
+    padding: 0 56px 48px;
+    max-width: 520px;
+}
+.hero-meta-tag {
+    font-size: 0.68rem; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
+}
+.hero-rating-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;
+}
+.hero-rating-row .hstar { color: #f5c518; font-size: 0.9rem; }
+.hero-rating-row strong { color: var(--beige); font-size: 1rem; font-weight: 700; }
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-weight: 700; color: #fff;
+    letter-spacing: 1px; line-height: 1.08;
+    margin-bottom: 14px;
+}
+.hero-desc {
+    font-size: 0.84rem; color: var(--text-muted);
+    line-height: 1.7; margin-bottom: 24px;
+    max-width: 400px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-watch-hero {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #e50914; color: #fff; border: none;
+    padding: 12px 28px; border-radius: 5px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    text-decoration: none; transition: background .2s;
+}
+.btn-watch-hero:hover { background: #c1070f; }
+.btn-addlist-hero {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(131,153,88,0.1); color: var(--accent);
+    border: 1.5px solid var(--accent); padding: 12px 22px;
+    border-radius: 5px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem; font-weight: 600; cursor: pointer;
+    text-decoration: none; transition: all .2s;
+}
+.btn-addlist-hero:hover { background: rgba(131,153,88,0.2); }
+.hero-dots {
+    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 5;
+}
+.hero-dot {
+    width: 26px; height: 3px; border-radius: 2px;
+    background: rgba(247,244,213,0.2); cursor: pointer;
+    transition: background .3s;
+}
+.hero-dot.active { background: var(--accent); }
+
+/* ══ SECTION WRAPPER ══ */
+.sec { padding: 28px 48px 0; }
+.sec-last { padding-bottom: 40px; }
+
+/* ══ SECTION HEAD ══ */
+.sec-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+}
+.sec-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700; color: var(--beige);
+}
+.sec-tabs { display: flex; gap: 22px; }
+.sec-tab {
+    font-size: 0.78rem; color: var(--text-muted);
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    padding-bottom: 3px; border-bottom: 2px solid transparent;
+    transition: all .2s; user-select: none;
+}
+.sec-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.sec-tab:hover { color: var(--text-dim); }
+
+/* ══ GENRE PILLS ══ */
+.gpills {
+    display: flex; gap: 9px; margin-bottom: 20px;
+    overflow-x: auto; scrollbar-width: none;
+    padding-bottom: 2px;
+}
+.gpills::-webkit-scrollbar { display: none; }
+.gpill {
+    flex-shrink: 0; padding: 6px 18px; border-radius: 22px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.3px;
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all .2s; white-space: nowrap;
+    text-decoration: none; display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+}
+.gpill:hover { border-color: var(--accent); color: var(--accent); }
+.gpill.act-red { background: #e50914; color: #fff; border-color: #e50914; }
+.gpill.act-green { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+/* ══ FILM SCROLL ROW ══ */
+.fscroll-wrap { position: relative; }
+.fscroll {
+    display: flex; gap: 14px; overflow-x: auto;
+    padding-bottom: 8px; scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.fscroll::-webkit-scrollbar { display: none; }
+
+/* ══ FILM CARD ══ */
+.fcard {
+    flex: 0 0 165px; scroll-snap-align: start;
+    cursor: pointer; text-decoration: none;
+    transition: transform .25s;
+}
+.fcard:hover { transform: translateY(-4px); }
+.fcard-poster {
+    width: 165px; height: 240px; border-radius: 9px;
+    background: var(--surface); border: 1px solid var(--border);
+    overflow: hidden; position: relative;
+    transition: border-color .25s, box-shadow .25s;
+}
+.fcard:hover .fcard-poster {
+    border-color: var(--border-strong);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+}
+.fcard-poster img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .3s;
+}
+.fcard:hover .fcard-poster img { transform: scale(1.05); }
+.fcard-init {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem; color: rgba(247,244,213,0.1);
+    pointer-events: none;
+}
+.fcard-badge {
+    position: absolute; bottom: 7px; right: 8px;
+    background: rgba(9,30,20,0.88); color: var(--accent);
+    font-size: 0.65rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    border: 1px solid rgba(131,153,88,0.3);
+}
+.fcard-title {
+    font-size: 0.82rem; font-weight: 600; color: var(--text);
+    margin-top: 9px; line-height: 1.35;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 165px;
+}
+.fcard-year { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+.fcard-meta {
+    display: flex; align-items: center; gap: 5px; margin-top: 4px;
+}
+.fcard-meta .ico { color: var(--rosy-brown); font-size: 0.68rem; }
+.fcard-meta span { font-size: 0.72rem; color: var(--text-muted); }
+
+/* ══ MOVIES DIVIDER SECTION ══ */
+.movies-section {
+    margin-top: 36px;
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+}
+
+/* ══ SORT BAR ══ */
+.sort-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+}
+.sort-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sort-lbl { font-size: 0.74rem; color: var(--text-muted); }
+.sort-active {
+    padding: 6px 16px; border-radius: 22px;
+    font-size: 0.73rem; font-weight: 700;
+    background: var(--accent); color: var(--bg); border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+}
+.sort-sel {
+    padding: 6px 14px; border-radius: 22px; font-size: 0.73rem;
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border); outline: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s;
+}
+.sort-sel:hover { border-color: var(--accent); }
+.rating-right { display: flex; align-items: center; gap: 8px; }
+.rating-right .rstar { color: #f5c518; font-size: 0.9rem; }
+.rslider {
+    -webkit-appearance: none; width: 100px; height: 3px;
+    background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+}
+.rslider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 13px; height: 13px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+.rval { font-size: 0.74rem; color: var(--text-muted); min-width: 28px; }
+
+/* ══ SCROLL WITH ARROWS ══ */
+.arrow-wrap {
+    display: flex; align-items: center; gap: 12px;
+}
+.sarrow {
+    flex-shrink: 0; width: 32px; height: 130px;
+    background: rgba(131,153,88,0.07); border: 1px solid var(--border);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    color: var(--accent); cursor: pointer; font-size: 1.2rem;
+    transition: all .2s; user-select: none; align-self: center;
+}
+.sarrow:hover { background: rgba(131,153,88,0.18); border-color: var(--border-strong); }
+
+/* ══ QUERY CARDS ══ */
+.qgrid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin-top: 20px;
+}
+.qcard {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 11px; padding: 18px 20px;
+    text-decoration: none; display: block;
+    transition: all .25s; cursor: pointer;
+}
+.qcard:hover {
+    border-color: var(--border-strong);
+    background: var(--surface2);
+    transform: translateY(-2px);
+}
+.qcard-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.qcard-q { color: var(--text-muted); font-size: 0.78rem; font-style: italic; line-height: 1.5; }
+
+/* ══ STATS BAR ══ */
+.stats-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: center;
+}
+.stat-item {
+    flex: 1; max-width: 200px; text-align: center;
+    padding: 20px 16px; border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700; color: var(--accent);
+}
+.stat-lbl {
+    font-size: 0.68rem; color: var(--text-muted);
+    letter-spacing: 1.2px; text-transform: uppercase; margin-top: 3px;
+}
+
+/* ══ NF FOOTER ══ */
+.nf-footer {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 32px 48px 18px; margin-top: 48px;
+}
+.nf-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr) 1.8fr;
+    gap: 28px; margin-bottom: 24px;
+}
+.nf-col h4 {
+    font-size: 0.8rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 12px; letter-spacing: 0.5px;
+}
+.nf-col a, .nf-col p {
+    display: block; font-size: 0.72rem; color: var(--text-muted);
+    line-height: 2.1; text-decoration: none; transition: color .2s;
+}
+.nf-col a:hover { color: var(--accent); }
+.nf-news {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; padding: 16px;
+}
+.nf-news strong { display: block; font-size: 0.84rem; color: var(--beige); margin-bottom: 5px; }
+.nf-news p { font-size: 0.72rem; color: var(--text-muted); line-height: 1.65; }
+.nf-form { display: flex; gap: 7px; margin-top: 12px; }
+.nf-form input {
+    flex: 1; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 8px 12px; color: var(--text);
+    font-size: 0.72rem; outline: none; font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s;
+}
+.nf-form input:focus { border-color: var(--accent); }
+.nf-form button {
+    background: var(--accent); color: var(--bg); border: none;
+    border-radius: 5px; padding: 8px 16px;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: background .2s;
+}
+.nf-form button:hover { background: #6e8245; }
+.nf-copy {
+    border-top: 1px solid var(--border); padding-top: 16px;
+    font-size: 0.67rem; color: var(--text-muted); text-align: center;
+}
+
+/* ══ HOVER TOOLTIP GENRE ══ */
+.fcard-genres {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(9,30,20,0.92);
+    padding: 10px 10px 6px;
+    transform: translateY(100%);
+    transition: transform .25s;
+    display: flex; flex-wrap: wrap; gap: 4px;
+}
+.fcard:hover .fcard-genres { transform: translateY(0); }
+.fcard-genres .gchip {
+    font-size: 0.6rem; font-weight: 600; padding: 2px 7px; border-radius: 10px;
+    background: rgba(131,153,88,0.2); color: var(--accent);
+    border: 1px solid rgba(131,153,88,0.25);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
-<!-- HERO -->
-<div style="position:relative; overflow:hidden; padding:72px 40px 60px; text-align:center;
-     background:linear-gradient(170deg,#091e14 0%,#0c2a18 40%,#091e14 100%);">
-    <div style="position:absolute;width:500px;height:500px;border-radius:50%;
-         background:radial-gradient(circle,rgba(131,153,88,0.07),transparent 70%);
-         top:-150px;left:-100px;pointer-events:none;"></div>
-    <div style="position:absolute;width:400px;height:400px;border-radius:50%;
-         background:radial-gradient(circle,rgba(16,86,102,0.1),transparent 70%);
-         bottom:-100px;right:-50px;pointer-events:none;"></div>
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<div class="hero-section" id="heroSection">
+    <!-- poster full-bleed, diganti JS -->
+    <img id="heroBgImg" class="hero-bg-img" src="" alt="" style="opacity:0;">
+    <div class="hero-backdrop"></div>
 
-    <div style="position:relative;z-index:1;max-width:680px;margin:0 auto;">
-        <div style="display:inline-block;font-size:0.7rem;font-weight:600;letter-spacing:3px;
-             color:var(--accent);text-transform:uppercase;padding:5px 16px;margin-bottom:20px;
-             background:rgba(131,153,88,0.1);border:1px solid var(--border);border-radius:20px;">
-            Sistem Rekomendasi Film
+    <!-- Hero content — akan di-update JS saat slide berganti -->
+    <div class="hero-content" id="heroContent" style="opacity:0;transition:opacity .35s;">
+        <div class="hero-meta-tag" id="heroMeta"></div>
+        <div class="hero-rating-row">
+            <span class="hstar">★</span>
+            <strong id="heroRating"></strong>
+            <span>·</span>
+            <span id="heroYear2"></span>
         </div>
-        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2.4rem,6vw,4rem);
-             font-weight:700;line-height:1.15;margin-bottom:18px;color:var(--beige);">
-            Temukan Film yang<br><span style="color:var(--accent);">Tepat Untukmu</span>
-        </h1>
-        <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.75;margin-bottom:36px;">
-            Cari film berdasarkan genre, suasana hati, atau cerita menggunakan model
-            <strong style="color:var(--text-dim);">TF-IDF</strong>.
-        </p>
-        <form action="/cari" method="get" style="display:flex;gap:10px;max-width:580px;margin:0 auto;">
-            <input class="search-input" name="q"
-                   placeholder="Contoh: film horor menegangkan, atau aksi superhero...">
-            <button class="btn btn-primary" type="submit" style="white-space:nowrap;padding:10px 24px;">
-                Cari
-            </button>
-        </form>
+        <div class="hero-title" id="heroTitle"></div>
+        <div class="hero-desc" id="heroDesc"></div>
+        <div class="hero-btns">
+            <a href="#" class="btn-watch-hero" id="heroLinkWatch">▶ TONTON</a>
+            <a href="#" class="btn-addlist-hero" id="heroLinkSimilar">+ CARI SERUPA</a>
+        </div>
+    </div>
+
+    <div class="hero-dots" id="heroDots">
+        {% for film in film_populer[:4] %}
+        <div class="hero-dot {% if loop.first %}active{% endif %}"
+             onclick="setHeroSlide({{ loop.index0 }})"></div>
+        {% endfor %}
     </div>
 </div>
 
-<!-- STATS BAR -->
-<div style="background:var(--surface);border-bottom:1px solid var(--border);">
-    <div class="container">
-        <div style="display:flex;justify-content:center;gap:0;padding:0;">
-            {% for label, val in [('Total Film', total),('Genre', genres|length),('Model IR', 2),('Query Uji', 10)] %}
-            <div style="flex:1;max-width:180px;text-align:center;padding:18px 12px;{% if not loop.last %}border-right:1px solid var(--border);{% endif %}">
-                <div style="font-family:'Playfair Display',serif;font-size:1.9rem;
-                     font-weight:700;color:var(--accent);">{{ val }}</div>
-                <div style="color:var(--text-muted);font-size:0.7rem;letter-spacing:1px;
-                     text-transform:uppercase;margin-top:2px;">{{ label }}</div>
-            </div>
+<!-- ══ STATS BAR ══════════════════════════════════════════════════ -->
+<div class="stats-bar">
+    {% for label, val in [('Total Film', total), ('Genre', genres|length), ('Model IR', 2), ('Query Uji', 10)] %}
+    <div class="stat-item">
+        <div class="stat-val">{{ val }}</div>
+        <div class="stat-lbl">{{ label }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ══ TRENDS NOW ════════════════════════════════════════════════ -->
+<div class="sec" style="padding-top:32px;">
+    <div class="sec-head">
+        <div class="sec-title">
+            <span style="font-size:1.15rem;">↗</span> Trends Now
+        </div>
+        <div class="sec-tabs">
+            <span class="sec-tab" onclick="setTab(this,'trends')">🔥 Populer</span>
+            <span class="sec-tab" onclick="setTab(this,'trends')">★ Premium</span>
+            <span class="sec-tab active" onclick="setTab(this,'trends')">+ Terbaru</span>
+        </div>
+    </div>
+
+    <div class="gpills" id="trendsGenrePills">
+        <a href="/cari" class="gpill act-red">Semua</a>
+        {% for g in genres %}
+        <a href="/cari?genre={{ g }}" class="gpill {% if loop.index == 4 %}act-green{% elif loop.index == 7 %}act-green{% endif %}">{{ g }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="fscroll-wrap">
+        <div class="fscroll" id="trendsScroll">
+            {% for film in film_populer %}
+            {% set gl = film.genre.split(',') if film.genre else [] %}
+            <a href="/detail/{{ film.id }}" class="fcard">
+                <div class="fcard-poster">
+                    {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
+                    <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
+                    <div class="fcard-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
+                    <div class="fcard-genres">
+                        {% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}
+                    </div>
+                </div>
+                <div class="fcard-title" title="{{ film.judul }}">{{ film.judul }}</div>
+                <div class="fcard-year">{{ film.tahun }}</div>
+                <div class="fcard-meta">
+                    <span class="ico">♥</span><span class="ico">👁</span>
+                    <span>{{ "%.1f"|format(film.rating|float) }}</span>
+                </div>
+            </a>
             {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- FILM POPULER -->
-<div class="container" style="padding-top:48px;">
-    <div class="section-header">
-        <div class="section-bar"></div>
-        <h2 class="section-title">Film Terpopuler</h2>
+<!-- ══ SEMUA FILM ════════════════════════════════════════════════ -->
+<div class="sec movies-section">
+    <div class="sec-head">
+        <div class="sec-title">
+            <span>🎬</span> Semua Film
+        </div>
+        <div class="sec-tabs">
+            <span class="sec-tab active">✓ Film Populer</span>
+            <span class="sec-tab">▷ Berdasarkan Genre</span>
+            <a href="/cari" style="font-size:0.78rem;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:5px;padding-bottom:3px;">🔍 Cari Film</a>
+        </div>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:14px; align-items:start;">
-        {% for film in film_populer %}
-        {% set genres_list = film.genre.split(',') if film.genre else [] %}
-        <a href="/detail/{{ film.id }}" style="text-decoration:none;">
-            <div class="film-card">
-                <div class="film-card-poster">
-                    {% if film.poster_url %}
-                    <img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="onImgError(this)">
-                    {% endif %}
-                    <div class="film-card-initials" {% if film.poster_url %}style="display:none;"{% endif %}>
-                        {{ film.judul[:2]|upper }}
+
+    <div class="gpills">
+        <a href="/cari" class="gpill act-red">Semua</a>
+        {% for g in genres %}
+        <a href="/cari?genre={{ g }}" class="gpill {% if loop.index == 4 %}act-green{% elif loop.index == 8 %}act-green{% endif %}">{{ g }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="sort-bar">
+        <div class="sort-left">
+            <span class="sort-lbl">Urutkan:</span>
+            <button class="sort-active">Terpopuler</button>
+            <select class="sort-sel" id="sortYear" onchange="applySortMovies()">
+                <option value="">Tahun ∨</option>
+                {% set years = [] %}
+                {% for f in film_populer %}
+                  {% if f.tahun and f.tahun|string not in years %}
+                    {% set _ = years.append(f.tahun|string) %}
+                  {% endif %}
+                {% endfor %}
+                {% for y in years|sort(reverse=True) %}
+                <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+            <select class="sort-sel" id="sortAZ" onchange="applySortMovies()">
+                <option value="az">A-Z ∨</option>
+                <option value="za">Z-A</option>
+            </select>
+        </div>
+        <div class="rating-right">
+            <span class="rstar">★</span>
+            <input type="range" class="rslider" id="ratingSlider" min="0" max="10" step="0.5" value="0" oninput="updateRating(this)">
+            <span class="rval" id="ratingVal">Semua</span>
+        </div>
+    </div>
+
+    <div class="arrow-wrap">
+        <div class="sarrow" onclick="scrollMs(-1)">‹</div>
+        <div class="fscroll" id="moviesScroll" style="flex:1;">
+            {% for film in film_populer %}
+            {% set gl = film.genre.split(',') if film.genre else [] %}
+            <a href="/detail/{{ film.id }}" class="fcard" 
+               data-title="{{ film.judul }}"
+               data-year="{{ film.tahun }}"
+               data-rating="{{ film.rating|float }}">
+                <div class="fcard-poster">
+                    {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
+                    <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
+                    <div class="fcard-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
+                    <div class="fcard-genres">
+                        {% for g in gl[:3] %}<span class="gchip">{{ g.strip() }}</span>{% endfor %}
                     </div>
-                    <div class="film-card-rating">★ {{ "%.1f"|format(film.rating|float) }}</div>
                 </div>
-                <div class="film-card-body">
-                    <div class="film-card-title">{{ film.judul }}</div>
-                    <div class="film-card-meta">{{ film.tahun|string|truncate(4,True,'') }}</div>
-                    <div>
-                        {% for g in genres_list[:2] %}
-                        <span class="badge-genre">{{ g.strip() }}</span>
-                        {% endfor %}
-                    </div>
+                <div class="fcard-title" title="{{ film.judul }}">{{ film.judul }}</div>
+                <div class="fcard-year">{{ film.tahun }}</div>
+                <div class="fcard-meta">
+                    <span class="ico">♥</span><span class="ico">👁</span>
+                    <span>{{ "%.1f"|format(film.rating|float) }}</span>
                 </div>
-            </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="sarrow" onclick="scrollMs(1)">›</div>
+    </div>
+</div>
+
+<!-- ══ COBA QUERY ════════════════════════════════════════════════ -->
+<div class="sec sec-last" style="margin-top:36px;">
+    <div class="sec-head">
+        <div class="sec-title">
+            <span style="color:var(--rosy-brown);">✦</span> Coba Query Ini
+        </div>
+        <a href="/cari" style="font-size:0.78rem;color:var(--accent);text-decoration:none;">Lihat semua →</a>
+    </div>
+    <div class="qgrid">
+        {% set contoh = [
+            ('🦸 Superhero Aksi',    'film superhero aksi petualangan Marvel DC'),
+            ('👻 Horor Menegangkan', 'film horor seram menegangkan hantu monster'),
+            ('💕 Drama Romantis',    'film drama percintaan romantis cinta mengharukan'),
+            ('🚀 Fiksi Ilmiah',      'film fiksi ilmiah luar angkasa teknologi masa depan'),
+            ('😄 Komedi Segar',      'film komedi humor ringan lucu menghibur'),
+            ('🧙 Fantasi Sihir',     'film sihir fantasi petualangan penyihir'),
+        ] %}
+        {% for label, q in contoh %}
+        <a href="/cari?q={{ q }}" class="qcard">
+            <div class="qcard-title">{{ label }}</div>
+            <div class="qcard-q">"{{ q[:52] }}..."</div>
         </a>
         {% endfor %}
     </div>
 </div>
 
-<!-- CONTOH QUERY -->
-<div class="container" style="padding-top:48px;padding-bottom:48px;">
-    <div class="section-header">
-        <div class="section-bar" style="background:linear-gradient(to bottom,var(--rosy-brown),var(--midnight));"></div>
-        <h2 class="section-title">Coba Query Ini</h2>
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<div class="nf-footer">
+    <div class="nf-grid">
+        <div class="nf-col">
+            <h4>Resource</h4>
+            <a href="#">Tentang CineFind</a>
+            <a href="#">Forum Diskusi</a>
+            <a href="/evaluasi">Evaluasi Model</a>
+            <a href="#">Dataset Film</a>
+        </div>
+        <div class="nf-col">
+            <h4>Legal</h4>
+            <a href="#">Syarat Penggunaan</a>
+            <a href="#">Kebijakan Privasi</a>
+            <a href="#">Keamanan Data</a>
+        </div>
+        <div class="nf-col">
+            <h4>Akun</h4>
+            <a href="#">Profil Saya</a>
+            <a href="#">Watchlist</a>
+            <a href="#">Koleksi</a>
+            <a href="/tentang">Panduan</a>
+        </div>
+        <div class="nf-col">
+            <h4>CineFind Indonesia</h4>
+            <p>Universitas Lampung</p>
+            <p>FMIPA — Informatika</p>
+            <p style="margin-top:8px;color:var(--accent);">©2025–2026 All Rights Reserved</p>
+        </div>
+        <div class="nf-news">
+            <strong>Newsletter</strong>
+            <p>Dapatkan rekomendasi film terbaru langsung di email kamu. Inspired by CineFind.</p>
+            <form class="nf-form" onsubmit="return false;">
+                <input type="email" placeholder="email@kamu.com">
+                <button type="submit">Daftar</button>
+            </form>
+        </div>
     </div>
-    <div class="grid-3">
-        {% set contoh = [
-            ('Superhero Aksi',   'film superhero aksi petualangan Marvel DC'),
-            ('Horor Menegangkan','film horor seram menegangkan hantu monster'),
-            ('Drama Romantis',   'film drama percintaan romantis cinta mengharukan'),
-            ('Fiksi Ilmiah',     'film fiksi ilmiah luar angkasa teknologi masa depan'),
-            ('Komedi Segar',     'film komedi humor ringan lucu menghibur'),
-            ('Fantasi Sihir',    'film sihir fantasi petualangan penyihir'),
-        ] %}
-        {% for label, q in contoh %}
-        <a href="/cari?q={{ q }}" style="text-decoration:none;">
-            <div style="background:var(--surface);border:1px solid var(--border);
-                 border-radius:10px;padding:16px 18px;transition:all .25s;height:100%;"
-                 onmouseover="this.style.borderColor='var(--border-strong)';this.style.background='var(--surface2)'"
-                 onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
-                <div style="font-size:0.88rem;font-weight:600;margin-bottom:5px;color:var(--text);">{{ label }}</div>
-                <div style="color:var(--text-muted);font-size:0.76rem;font-style:italic;">"{{ q[:50] }}..."</div>
-            </div>
-        </a>
-        {% endfor %}
+    <div class="nf-copy">
+        Proyek UAS Temu Kembali Informasi (COM620321) &nbsp;·&nbsp; Universitas Lampung FMIPA &nbsp;·&nbsp; 2025–2026 Genap
     </div>
 </div>
+
+<!-- ══ JAVASCRIPT INTERAKTIF ══════════════════════════════════════ -->
+<script>
+// ── Data film dari Jinja ──────────────────────────────────────────
+const FILMS_DATA = [
+    {% for film in film_populer %}
+    {
+        id: {{ film.id }},
+        judul: {{ film.judul | tojson }},
+        tahun: {{ film.tahun | tojson }},
+        rating: {{ film.rating | float }},
+        sinopsis: {{ (film.sinopsis or '') | tojson }},
+        genre: {{ (film.genre or '') | tojson }},
+        poster_url: {{ (film.poster_url or '') | tojson }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+// ── HERO SLIDESHOW ────────────────────────────────────────────────
+let heroIdx = 0;
+let heroTimer = null;
+
+function setHeroSlide(idx) {
+    if (idx < 0 || idx >= FILMS_DATA.length) return;
+    heroIdx = idx;
+    const f = FILMS_DATA[idx];
+    const genres = f.genre ? f.genre.split(',') : [];
+
+    // Swap background poster dengan crossfade
+    const bgImg = document.getElementById('heroBgImg');
+    if (f.poster_url) {
+        // Buat img baru dulu, kalau load sukses baru swap
+        const tmp = new Image();
+        tmp.onload = function() {
+            bgImg.style.opacity = '0';
+            setTimeout(() => {
+                bgImg.src = f.poster_url;
+                bgImg.style.opacity = '1';
+            }, 200);
+        };
+        tmp.onerror = function() {
+            bgImg.style.opacity = '0';
+        };
+        tmp.src = f.poster_url;
+    } else {
+        bgImg.style.opacity = '0';
+    }
+
+    // Update teks konten hero
+    document.getElementById('heroMeta').textContent =
+        (genres[0] ? genres[0].trim() : 'Film') + '  ·  ' + (f.tahun || '');
+    document.getElementById('heroRating').textContent =
+        f.rating ? f.rating.toFixed(1) : '-';
+    document.getElementById('heroYear2').textContent = f.tahun || '';
+    document.getElementById('heroTitle').textContent = f.judul.toUpperCase();
+    document.getElementById('heroDesc').textContent =
+        f.sinopsis ? f.sinopsis.substring(0, 140) + '...' : 'Film populer pilihan CineFind.';
+    document.getElementById('heroLinkWatch').href = '/detail/' + f.id;
+    document.getElementById('heroLinkSimilar').href = '/cari?q=' + encodeURIComponent(f.judul);
+
+    // Update dots
+    document.querySelectorAll('.hero-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+    });
+
+    // Fade in hero content
+    const hc = document.getElementById('heroContent');
+    hc.style.opacity = '0';
+    setTimeout(() => { hc.style.opacity = '1'; }, 250);
+}
+
+function startHeroAuto() {
+    heroTimer = setInterval(() => {
+        const next = (heroIdx + 1) % Math.min(FILMS_DATA.length, 6);
+        setHeroSlide(next);
+    }, 5000);
+}
+
+document.querySelectorAll('.hero-dot').forEach((d, i) => {
+    d.addEventListener('click', () => {
+        clearInterval(heroTimer);
+        setHeroSlide(i);
+        startHeroAuto();
+    });
+});
+// Init langsung set slide 0
+setHeroSlide(0);
+startHeroAuto();
+
+// ── SCROLL ARROWS ─────────────────────────────────────────────────
+function scrollMs(dir) {
+    document.getElementById('moviesScroll').scrollBy({ left: dir * 600, behavior: 'smooth' });
+}
+
+// ── RATING SLIDER ─────────────────────────────────────────────────
+function updateRating(el) {
+    const v = parseFloat(el.value);
+    const lbl = document.getElementById('ratingVal');
+    lbl.textContent = v > 0 ? v.toFixed(1) + '+' : 'Semua';
+
+    const cards = document.querySelectorAll('#moviesScroll .fcard');
+    cards.forEach(card => {
+        const r = parseFloat(card.dataset.rating || 0);
+        card.style.display = (v === 0 || r >= v) ? '' : 'none';
+    });
+}
+
+// ── SORT MOVIES ───────────────────────────────────────────────────
+function applySortMovies() {
+    const yearFilter = document.getElementById('sortYear').value;
+    const azVal = document.getElementById('sortAZ').value;
+    const container = document.getElementById('moviesScroll');
+    const cards = Array.from(container.querySelectorAll('.fcard'));
+
+    // filter tahun
+    cards.forEach(c => {
+        const y = c.dataset.year;
+        c.style.display = (!yearFilter || y === yearFilter) ? '' : 'none';
+    });
+
+    // sort A-Z / Z-A
+    const visible = cards.filter(c => c.style.display !== 'none');
+    visible.sort((a, b) => {
+        const ta = a.dataset.title || '';
+        const tb = b.dataset.title || '';
+        return azVal === 'za' ? tb.localeCompare(ta) : ta.localeCompare(tb);
+    });
+    visible.forEach(c => container.appendChild(c));
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────
+function setTab(el, group) {
+    el.closest('.sec-tabs').querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// ── GENRE PILL ACTIVE TOGGLE ──────────────────────────────────────
+document.querySelectorAll('.gpill').forEach(pill => {
+    pill.addEventListener('click', function(e) {
+        // jangan prevent default — biarkan navigate, tapi highlight dulu
+        const parent = this.closest('.gpills');
+        if (parent) {
+            parent.querySelectorAll('.gpill').forEach(p => {
+                p.classList.remove('act-red', 'act-green');
+            });
+            this.classList.add('act-red');
+        }
+    });
+});
+</script>
+
 {% endblock %}
