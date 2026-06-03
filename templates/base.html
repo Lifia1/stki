@@ -48,41 +48,91 @@
         /* ===== NAVBAR ===== */
         nav {
             position: sticky; top: 0; z-index: 999;
-            height: 62px;
-            background: rgba(9,30,20,0.94);
+            height: 68px;
+            background: rgba(9,30,20,0.96);
             backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px;
+            padding: 0 48px;
+            gap: 24px;
         }
+
+        /* ── Logo ── */
         .nav-logo {
-            display: flex; align-items: center; gap: 10px;
-            text-decoration: none;
+            display: flex; align-items: center; gap: 11px;
+            text-decoration: none; flex-shrink: 0;
         }
+
+        /* SVG clapperboard icon */
         .nav-logo-icon {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: linear-gradient(135deg, var(--moss-green), var(--teal));
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, #1a4a28, #0d3520);
+            border: 1.5px solid rgba(131,153,88,0.45);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(131,153,88,0.2);
+            flex-shrink: 0;
         }
+
         .nav-logo-text {
             font-family: 'Playfair Display', serif;
-            font-size: 1.25rem; font-weight: 700;
-            color: var(--beige);
+            font-size: 1.5rem; font-weight: 700;
+            /* Gold gradient teks seperti referensi */
+            background: linear-gradient(135deg, #c9a84c 0%, #e8c96d 40%, #b8922a 70%, #d4a843 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            text-shadow: none;
+            filter: drop-shadow(0 1px 3px rgba(180,140,40,0.3));
         }
-        .nav-logo-badge {
-            font-size: 0.6rem; font-weight: 600;
-            background: rgba(131,153,88,0.15);
-            color: var(--accent); padding: 2px 7px;
-            border-radius: 20px; border: 1px solid var(--border);
-            letter-spacing: 1px;
+
+        /* ── Search bar tengah ── */
+        .nav-search {
+            flex: 1; max-width: 460px;
+            position: relative;
+            display: flex; align-items: center;
         }
-        .nav-links { display: flex; gap: 4px; align-items: center; }
+        .nav-search-icon {
+            position: absolute; left: 14px;
+            color: var(--text-muted); font-size: 0.9rem;
+            pointer-events: none; line-height: 1;
+        }
+        .nav-search-input {
+            width: 100%;
+            background: rgba(247,244,213,0.05);
+            border: 1.5px solid var(--border);
+            border-radius: 24px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            padding: 9px 18px 9px 38px;
+            outline: none;
+            transition: all .22s;
+        }
+        .nav-search-input:focus {
+            border-color: var(--accent);
+            background: rgba(247,244,213,0.08);
+            box-shadow: 0 0 0 3px rgba(131,153,88,0.12);
+        }
+        .nav-search-input::placeholder { color: var(--text-muted); }
+        .nav-search-btn {
+            position: absolute; right: 6px;
+            background: var(--accent); color: var(--bg);
+            border: none; border-radius: 18px;
+            padding: 5px 14px; font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: background .2s;
+        }
+        .nav-search-btn:hover { background: #6e8245; }
+
+        /* ── Nav links ── */
+        .nav-links { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
         .nav-links a {
             text-decoration: none; color: var(--text-muted);
-            font-size: 0.83rem; font-weight: 500;
-            padding: 6px 14px; border-radius: 8px;
-            transition: all .2s;
+            font-size: 0.86rem; font-weight: 500;
+            padding: 7px 15px; border-radius: 8px;
+            transition: all .2s; white-space: nowrap;
         }
         .nav-links a:hover { color: var(--text); background: rgba(131,153,88,0.1); }
         .nav-links a.active {
@@ -90,6 +140,7 @@
             background: rgba(131,153,88,0.15);
             border: 1px solid var(--border);
         }
+
         .nav-menu-btn {
             display: none; flex-direction: column; gap: 5px;
             cursor: pointer; padding: 5px; background: none; border: none;
@@ -306,9 +357,13 @@
         .footer-logo { font-family: 'Playfair Display', serif; color: var(--accent); font-size: 1rem; }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) { .grid-6 { grid-template-columns: repeat(4,1fr); } }
+        @media (max-width: 1024px) {
+            .grid-6 { grid-template-columns: repeat(4,1fr); }
+            .nav-search { max-width: 280px; }
+        }
         @media (max-width: 768px) {
             nav { padding: 0 20px; }
+            .nav-search { display: none; }
             .container { padding: 0 20px; }
             footer { padding: 24px 20px; }
             .grid-6 { grid-template-columns: repeat(3,1fr); }
@@ -335,23 +390,62 @@
 <body>
 
 <nav>
+    <!-- Logo -->
     <a href="/" class="nav-logo">
-        <div class="nav-logo-icon">🎬</div>
+        <div class="nav-logo-icon">
+            <!-- Clapperboard SVG bold -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Body clapperboard -->
+                <rect x="2" y="8" width="20" height="14" rx="2" fill="#839958"/>
+                <!-- Strip hitam-putih atas -->
+                <rect x="2" y="5" width="20" height="4" rx="1.5" fill="#c9a84c"/>
+                <!-- Garis diagonal strip -->
+                <line x1="7"  y1="5" x2="5"  y2="9" stroke="#0f2d1c" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="12" y1="5" x2="10" y2="9" stroke="#0f2d1c" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="17" y1="5" x2="15" y2="9" stroke="#0f2d1c" stroke-width="1.8" stroke-linecap="round"/>
+                <!-- Lubang film (3 titik di body) -->
+                <circle cx="7"  cy="14" r="1.5" fill="#0f2d1c" opacity="0.6"/>
+                <circle cx="12" cy="14" r="1.5" fill="#0f2d1c" opacity="0.6"/>
+                <circle cx="17" cy="14" r="1.5" fill="#0f2d1c" opacity="0.6"/>
+                <!-- Garis play tengah -->
+                <rect x="5" y="17" width="14" height="2" rx="1" fill="#0f2d1c" opacity="0.4"/>
+            </svg>
+        </div>
         <span class="nav-logo-text">CineFind</span>
     </a>
+
+    <!-- Search bar tengah -->
+    <form class="nav-search" action="/cari" method="get">
+        <span class="nav-search-icon">🔍</span>
+        <input class="nav-search-input"
+               type="text" name="q"
+               placeholder="Cari judul, genre, sinopsis..."
+               autocomplete="off">
+        <button class="nav-search-btn" type="submit">Cari</button>
+    </form>
+
+    <!-- Nav links kanan -->
     <div class="nav-links">
         <a href="/"         class="{% if active=='beranda'  %}active{% endif %}">Beranda</a>
         <a href="/cari"     class="{% if active=='cari'     %}active{% endif %}">Cari Film</a>
         <a href="/evaluasi" class="{% if active=='evaluasi' %}active{% endif %}">Evaluasi</a>
         <a href="/tentang"  class="{% if active=='tentang'  %}active{% endif %}">Tentang</a>
     </div>
+
     <button class="nav-menu-btn" onclick="toggleMenu()">
         <span></span><span></span><span></span>
     </button>
 </nav>
 
-<div id="mobileMenu" style="display:none; position:fixed; top:62px; left:0; right:0; z-index:998;
+<div id="mobileMenu" style="display:none; position:fixed; top:68px; left:0; right:0; z-index:998;
      background:rgba(9,30,20,0.97); border-bottom:1px solid var(--border); padding:12px 20px;">
+    <!-- Search mobile -->
+    <form action="/cari" method="get" style="margin-bottom:10px;">
+        <input type="text" name="q" placeholder="Cari film..."
+               style="width:100%; background:rgba(247,244,213,0.06); border:1.5px solid var(--border);
+                      border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif;
+                      font-size:0.88rem; padding:10px 16px; outline:none;">
+    </form>
     <a href="/"         style="display:block; padding:11px 14px; color:var(--text-dim); text-decoration:none; font-size:.9rem; border-radius:8px; margin-bottom:2px;">Beranda</a>
     <a href="/cari"     style="display:block; padding:11px 14px; color:var(--text-dim); text-decoration:none; font-size:.9rem; border-radius:8px; margin-bottom:2px;">Cari Film</a>
     <a href="/evaluasi" style="display:block; padding:11px 14px; color:var(--text-dim); text-decoration:none; font-size:.9rem; border-radius:8px; margin-bottom:2px;">Evaluasi</a>
@@ -373,7 +467,6 @@ function toggleMenu() {
     const m = document.getElementById('mobileMenu');
     m.style.display = m.style.display === 'none' ? 'block' : 'none';
 }
-// helper: hide broken poster img → show initials
 function onImgError(img) {
     img.style.display = 'none';
     const init = img.parentElement.querySelector('.film-card-initials, .result-poster-init');

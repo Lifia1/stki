@@ -742,28 +742,6 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ GENRE SPOTLIGHT ══ -->
-<div class="sec" style="padding-top:48px;">
-    <div class="sec-head">
-        <div class="sec-title">
-            Jelajahi Genre
-        </div>
-        <a href="/cari" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Semua genre →</a>
-    </div>
-    <div class="genre-spotlight">
-        {% set genre_icons = {'Aksi':'⚔️','Animasi':'✨','Barat':'🤠','Drama':'🎭','Fantasi':'🧙','Horor':'👻','Komedi':'😄','Kengerian':'💀','Kejahatan':'🔪','Keluarga':'👨‍👩‍👧','Misteri':'🔍','Musik':'🎵','Percintaan':'💕','Petualangan':'🗺️','Sejarah':'📜','Fiksi':'🚀','Dokumenter':'📽️','Thriller':'😱'} %}
-        {% for g in genres[:8] %}
-        <a href="/cari?genre={{ g }}" class="genre-card">
-            <span class="genre-card-icon">{{ genre_icons.get(g, '🎬') }}</span>
-            <div class="genre-card-name">{{ g }}</div>
-            <div class="genre-card-count">Jelajahi film {{ g|lower }}</div>
-            <div class="genre-card-bar">
-                <div class="genre-card-bar-fill" style="width: {{ (loop.index * 13) % 80 + 20 }}%;"></div>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-</div>
 
 <!-- ══ SEMUA FILM + TOP RATED ══ -->
 <div class="sec fgrid-section">
