@@ -2,74 +2,643 @@
 {% set active = "cari" %}
 {% block title %}CineFind — Cari Film{% endblock %}
 
-{% block content %}
-<div class="container" style="padding-top:40px;padding-bottom:48px;">
+{% block head_extra %}
+<style>
+    /* Full screen search page styles */
+    .search-page-container {
+        min-height: calc(100vh - 68px - 120px);
+        padding: 48px 0 64px;
+    }
+    
+    .search-header {
+        margin-bottom: 36px;
+    }
+    
+    .search-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .search-header p {
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+    
+    /* Back button */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        transition: all 0.25s ease;
+        margin-bottom: 24px;
+    }
+    
+    .back-btn:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: rgba(131,153,88,0.08);
+        transform: translateX(-4px);
+    }
+    
+    .back-btn svg {
+        width: 18px;
+        height: 18px;
+        transition: transform 0.25s ease;
+    }
+    
+    .back-btn:hover svg {
+        transform: translateX(-3px);
+    }
+    
+    /* Enhanced search form */
+    .search-form-container {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin-bottom: 32px;
+    }
+    
+    .search-input-large {
+        flex: 1;
+        min-width: 300px;
+        background: rgba(247,244,213,0.04);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.1rem;
+        padding: 16px 24px;
+        outline: none;
+        transition: all 0.25s ease;
+    }
+    
+    .search-input-large:focus {
+        border-color: var(--accent);
+        background: rgba(247,244,213,0.06);
+        box-shadow: 0 0 0 4px rgba(131,153,88,0.15);
+    }
+    
+    .search-input-large::placeholder {
+        color: var(--text-muted);
+    }
+    
+    .btn-search-large {
+        background: linear-gradient(135deg, var(--accent), var(--teal));
+        color: var(--beige);
+        border: none;
+        border-radius: 12px;
+        padding: 16px 36px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+    
+    .btn-search-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(131,153,88,0.35);
+    }
+    
+    .filter-row {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        margin-top: 20px;
+    }
+    
+    .filter-item label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+    
+    .filter-select {
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        color: var(--text-dim);
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.95rem;
+        outline: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        min-width: 160px;
+    }
+    
+    .filter-select:hover {
+        border-color: var(--border-strong);
+    }
+    
+    .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(131,153,88,0.12);
+    }
+    
+    .method-badge {
+        background: rgba(131,153,88,0.15);
+        color: var(--accent);
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid rgba(131,153,88,0.3);
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .method-badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Results header */
+    .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+    
+    .results-count {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .results-query {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+    
+    .results-query em {
+        color: var(--accent);
+        font-style: normal;
+        font-weight: 500;
+    }
+    
+    /* Enhanced result item */
+    .result-item-large {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .result-item-large:hover {
+        border-color: var(--accent);
+        background: var(--surface2);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+    }
+    
+    .result-poster-large {
+        width: 100px;
+        height: 150px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--dark-green), var(--teal));
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+    
+    .result-item-large:hover .result-poster-large {
+        transform: scale(1.03);
+    }
+    
+    .result-poster-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .result-poster-large .result-poster-init {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        color: rgba(247,244,213,0.2);
+    }
+    
+    .result-rank-large {
+        min-width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .result-rank-large.top3 {
+        background: linear-gradient(135deg, var(--accent), var(--teal));
+        color: var(--beige);
+        box-shadow: 0 4px 15px rgba(131,153,88,0.3);
+    }
+    
+    .result-rank-large.normal {
+        background: rgba(131,153,88,0.1);
+        color: var(--text-muted);
+        border: 1.5px solid var(--border);
+    }
+    
+    .result-info-large {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .result-title-large {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    
+    .result-title-large a {
+        color: var(--text);
+        text-decoration: none;
+        transition: color 0.25s ease;
+    }
+    
+    .result-title-large a:hover {
+        color: var(--accent);
+    }
+    
+    .result-meta-large {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+    
+    .badge-genre-large {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 3px 4px 3px 0;
+        background: rgba(131,153,88,0.12);
+        color: var(--accent);
+        border: 1px solid rgba(131,153,88,0.25);
+        transition: all 0.2s ease;
+    }
+    
+    .badge-genre-large:hover {
+        background: rgba(131,153,88,0.2);
+        transform: scale(1.05);
+    }
+    
+    .result-synopsis-large {
+        color: var(--text-dim);
+        font-size: 0.92rem;
+        line-height: 1.7;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-top: 12px;
+    }
+    
+    .result-score-large {
+        text-align: center;
+        min-width: 110px;
+        flex-shrink: 0;
+        padding: 12px;
+        background: rgba(131,153,88,0.05);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+    }
+    
+    .score-label {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    
+    .score-num-large {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+    }
+    
+    .score-bar-large {
+        background: rgba(131,153,88,0.2);
+        border-radius: 4px;
+        height: 5px;
+        margin: 10px 0;
+        overflow: hidden;
+    }
+    
+    .score-bar-fill-large {
+        height: 5px;
+        border-radius: 4px;
+        background: linear-gradient(to right, var(--accent), var(--teal));
+        transition: width 0.5s ease;
+    }
+    
+    .score-detail {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+    
+    .score-rating {
+        font-size: 0.85rem;
+        color: var(--accent);
+        margin-bottom: 14px;
+    }
+    
+    .btn-detail-large {
+        background: transparent;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-detail-large:hover {
+        background: var(--accent);
+        color: var(--bg);
+        transform: translateY(-2px);
+    }
+    
+    /* Example queries section */
+    .example-section {
+        margin-top: 20px;
+    }
+    
+    .example-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .example-card {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 20px 24px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .example-card:hover {
+        border-color: var(--accent);
+        background: var(--surface2);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    
+    .example-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+    
+    .example-card-query {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-style: italic;
+    }
+    
+    /* Genre browse section */
+    .genre-section {
+        margin-top: 48px;
+    }
+    
+    .genre-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .genre-pill {
+        padding: 12px 26px;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--text-dim);
+        border: 1.5px solid var(--border);
+        text-decoration: none;
+        transition: all 0.25s ease;
+        font-family: 'DM Sans', sans-serif;
+    }
+    
+    .genre-pill:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(131,153,88,0.1);
+        transform: translateY(-2px);
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        background: var(--surface);
+        border-radius: 20px;
+        border: 1px solid var(--border);
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.6;
+    }
+    
+    .empty-state-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+    }
+    
+    .empty-state-desc {
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .search-page-container {
+            padding: 32px 0 48px;
+        }
+        
+        .search-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .search-form-container {
+            padding: 20px;
+        }
+        
+        .search-input-large {
+            font-size: 1rem;
+            padding: 14px 18px;
+        }
+        
+        .btn-search-large {
+            padding: 14px 24px;
+        }
+        
+        .filter-row {
+            gap: 14px;
+        }
+        
+        .result-item-large {
+            flex-wrap: wrap;
+            padding: 18px 20px;
+        }
+        
+        .result-score-large {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
 
-    <div style="margin-bottom:28px;">
-        <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:4px;">Cari Film</h1>
-        <p style="color:var(--text-muted);font-size:0.84rem;">Masukkan kata kunci bebas — genre, suasana, atau deskripsi film yang kamu cari</p>
+{% block content %}
+<div class="container search-page-container">
+
+    <!-- Back Button -->
+    <a href="/" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        Kembali ke Beranda
+    </a>
+
+    <div class="search-header">
+        <h1>Cari Film</h1>
+        <p>Masukkan kata kunci bebas — genre, suasana, atau deskripsi film yang kamu cari</p>
     </div>
 
     <!-- FORM PENCARIAN -->
-    <form action="/cari" method="get">
-        <div style="display:flex;gap:10px;margin-bottom:14px;">
-            <input class="search-input" name="q" value="{{ query }}"
-                   placeholder="Contoh: film horor menegangkan, atau petualangan keluarga..." autofocus>
-            <button class="btn btn-primary" type="submit" style="padding:10px 24px;white-space:nowrap;">Cari</button>
-        </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
-            <div>
-                <label class="form-label">Filter Genre</label>
-                <select name="genre" class="search-select" onchange="this.form.submit()">
-                    <option value="semua">Semua Genre</option>
-                    {% for g in genres %}
-                    <option value="{{ g }}" {% if filter_genre==g %}selected{% endif %}>{{ g }}</option>
-                    {% endfor %}
-                </select>
+    <div class="search-form-container">
+        <form action="/cari" method="get">
+            <div style="display:flex;gap:14px;margin-bottom:0;">
+                <input class="search-input-large" name="q" value="{{ query }}"
+                       placeholder="Contoh: film horor menegangkan, atau petualangan keluarga..." autofocus>
+                <button class="btn-search-large" type="submit">Cari</button>
             </div>
-            <div>
-                <label class="form-label">Jumlah Hasil</label>
-                <select name="topk" class="search-select">
-                    {% for k in [5,10,15,20] %}
-                    <option value="{{ k }}" {% if top_k==k %}selected{% endif %}>Top {{ k }}</option>
-                    {% endfor %}
-                </select>
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>Filter Genre</label>
+                    <select name="genre" class="filter-select" onchange="this.form.submit()">
+                        <option value="semua">Semua Genre</option>
+                        {% for g in genres %}
+                        <option value="{{ g }}" {% if filter_genre==g %}selected{% endif %}>{{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Jumlah Hasil</label>
+                    <select name="topk" class="filter-select">
+                        {% for k in [5,10,15,20,30] %}
+                        <option value="{{ k }}" {% if top_k==k %}selected{% endif %}>Top {{ k }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="align-self:flex-end;">
+                    <span class="method-badge">
+                        <span class="method-badge-dot"></span>
+                        TF-IDF + Cosine Similarity
+                    </span>
+                </div>
             </div>
-            <div style="align-self:flex-end;padding-bottom:2px;">
-                <span style="background:rgba(131,153,88,0.12);color:var(--accent);
-                     padding:8px 16px;border-radius:8px;font-size:0.76rem;font-weight:600;
-                     border:1px solid var(--border);letter-spacing:0.5px;display:inline-flex;
-                     align-items:center;gap:6px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
-                    TF-IDF + Cosine Similarity
-                </span>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <div class="divider"></div>
 
-    {% if error %}<div class="alert alert-warn">⚠ {{ error }}</div>{% endif %}
+    {% if error %}<div class="alert alert-warn">{{ error }}</div>{% endif %}
 
     {# ── MODE 1: Ada query → tampilkan hasil IR ── #}
     {% if query and hasil %}
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-        <span style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;">
-            {{ jumlah }} Film Ditemukan
-        </span>
-        <span style="color:var(--text-muted);font-size:0.8rem;">untuk: <em>"{{ query }}"</em>
-            {% if filter_genre and filter_genre not in ('semua','') %}
-            · genre <strong style="color:var(--accent);">{{ filter_genre }}</strong>
-            {% endif %}
-        </span>
+    <div class="results-header">
+        <div>
+            <span class="results-count">{{ jumlah }} Film Ditemukan</span>
+            <span class="results-query">untuk: <em>"{{ query }}"</em>
+                {% if filter_genre and filter_genre not in ('semua','') %}
+                &nbsp;·&nbsp;genre <strong style="color:var(--accent);">{{ filter_genre }}</strong>
+                {% endif %}
+            </span>
+        </div>
     </div>
 
     {% for film in hasil %}
     {% set persen = [((film.skor_relevansi|float)*100)|int, 100]|min %}
     {% set genres_list = film.genre.split(',') if film.genre else [] %}
-    <div class="result-item">
-        <a href="/detail/{{ film.id }}" style="text-decoration:none;flex-shrink:0;">
-            <div class="result-poster">
+    <div class="result-item-large" onclick="window.location='/detail/{{ film.id }}'">
+        <a href="/detail/{{ film.id }}" style="text-decoration:none;flex-shrink:0;" onclick="event.stopPropagation()">
+            <div class="result-poster-large">
                 {% if film.poster_url %}
                 <img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="onImgError(this)">
                 {% endif %}
@@ -78,57 +647,55 @@
                 </div>
             </div>
         </a>
-        <div class="result-rank {% if loop.index <= 3 %}top3{% else %}normal{% endif %}">{{ loop.index }}</div>
-        <div class="result-info">
-            <div class="result-title"><a href="/detail/{{ film.id }}">{{ film.judul }}</a></div>
-            <div class="result-meta">
+        <div class="result-rank-large {% if loop.index <= 3 %}top3{% else %}normal{% endif %}">{{ loop.index }}</div>
+        <div class="result-info-large">
+            <div class="result-title-large"><a href="/detail/{{ film.id }}" onclick="event.stopPropagation()">{{ film.judul }}</a></div>
+            <div class="result-meta-large">
                 {{ film.tahun|string|truncate(4,True,'') }}
                 {% if film.sutradara %}&nbsp;·&nbsp;{{ film.sutradara|truncate(40,True,'...') }}{% endif %}
             </div>
-            <div style="margin-bottom:9px;">
-                {% for g in genres_list[:3] %}
-                <span class="badge-genre">{{ g.strip() }}</span>
+            <div style="margin-bottom:12px;">
+                {% for g in genres_list[:4] %}
+                <span class="badge-genre-large">{{ g.strip() }}</span>
                 {% endfor %}
             </div>
-            <div class="result-synopsis">{{ film.sinopsis }}</div>
+            <div class="result-synopsis-large">{{ film.sinopsis }}</div>
         </div>
-        <div class="result-score">
-            <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:3px;letter-spacing:1px;">RELEVANSI</div>
-            <div class="score-num">{{ persen }}%</div>
-            <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ persen }}%;"></div></div>
-            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">Skor: {{ "%.4f"|format(film.skor_relevansi|float) }}</div>
-            <div style="font-size:0.72rem;color:var(--accent);margin-bottom:10px;">★ {{ "%.1f"|format(film.rating|float) }}</div>
-            <a href="/detail/{{ film.id }}" class="btn btn-ghost" style="font-size:0.74rem;padding:5px 12px;">Detail</a>
+        <div class="result-score-large" onclick="event.stopPropagation()">
+            <div class="score-label">Relevansi</div>
+            <div class="score-num-large">{{ persen }}%</div>
+            <div class="score-bar-large"><div class="score-bar-fill-large" style="width:{{ persen }}%;"></div></div>
+            <div class="score-detail">Skor: {{ "%.4f"|format(film.skor_relevansi|float) }}</div>
+            <div class="score-rating">★ {{ "%.1f"|format(film.rating|float) }}</div>
+            <a href="/detail/{{ film.id }}" class="btn-detail-large">Lihat Detail</a>
         </div>
     </div>
     {% endfor %}
 
     {% elif query and not hasil and not error %}
     {# ── Pencarian tidak menemukan hasil ── #}
-    <div style="text-align:center;padding:64px 0;">
-        <div style="font-size:2.8rem;margin-bottom:14px;opacity:.5;">🎬</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-muted);margin-bottom:8px;">Tidak Ada Hasil</div>
-        <div style="color:var(--text-muted);font-size:0.85rem;">Coba ubah kata kunci atau filter genre</div>
+    <div class="empty-state">
+        <div class="empty-state-icon">🎬</div>
+        <div class="empty-state-title">Tidak Ada Hasil</div>
+        <div class="empty-state-desc">Coba ubah kata kunci atau filter genre</div>
     </div>
 
     {% elif not query and filter_genre and filter_genre not in ('semua', '') %}
     {# ── MODE 2: Tidak ada query, tapi ada genre → Browse by genre ── #}
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
-        <span style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;">
-            Film Genre: <span style="color:var(--accent);">{{ filter_genre }}</span>
-        </span>
-        <span style="color:var(--text-muted);font-size:0.8rem;">
-            — semua film dalam database
-        </span>
+    <div class="results-header">
+        <div>
+            <span class="results-count">Film Genre: <span style="color:var(--accent);">{{ filter_genre }}</span></span>
+            <span class="results-query">— semua film dalam database</span>
+        </div>
     </div>
 
     {# Ambil semua film yang match genre dari hasil (backend sudah filter) #}
     {% if hasil %}
     {% for film in hasil %}
     {% set genres_list = film.genre.split(',') if film.genre else [] %}
-    <div class="result-item">
-        <a href="/detail/{{ film.id }}" style="text-decoration:none;flex-shrink:0;">
-            <div class="result-poster">
+    <div class="result-item-large" onclick="window.location='/detail/{{ film.id }}'">
+        <a href="/detail/{{ film.id }}" style="text-decoration:none;flex-shrink:0;" onclick="event.stopPropagation()">
+            <div class="result-poster-large">
                 {% if film.poster_url %}
                 <img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="onImgError(this)">
                 {% endif %}
@@ -137,78 +704,72 @@
                 </div>
             </div>
         </a>
-        <div class="result-rank normal">{{ loop.index }}</div>
-        <div class="result-info">
-            <div class="result-title"><a href="/detail/{{ film.id }}">{{ film.judul }}</a></div>
-            <div class="result-meta">
+        <div class="result-rank-large normal">{{ loop.index }}</div>
+        <div class="result-info-large">
+            <div class="result-title-large"><a href="/detail/{{ film.id }}" onclick="event.stopPropagation()">{{ film.judul }}</a></div>
+            <div class="result-meta-large">
                 {{ film.tahun|string|truncate(4,True,'') }}
                 {% if film.sutradara %}&nbsp;·&nbsp;{{ film.sutradara|truncate(40,True,'...') }}{% endif %}
             </div>
-            <div style="margin-bottom:9px;">
-                {% for g in genres_list[:3] %}
-                <span class="badge-genre">{{ g.strip() }}</span>
+            <div style="margin-bottom:12px;">
+                {% for g in genres_list[:4] %}
+                <span class="badge-genre-large">{{ g.strip() }}</span>
                 {% endfor %}
             </div>
-            <div class="result-synopsis">{{ film.sinopsis }}</div>
+            <div class="result-synopsis-large">{{ film.sinopsis }}</div>
         </div>
-        <div class="result-score">
-            <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:3px;letter-spacing:1px;">RATING</div>
-            <div class="score-num" style="color:var(--accent);">{{ "%.1f"|format(film.rating|float) }}</div>
-            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;">★ IMDb</div>
-            <a href="/detail/{{ film.id }}" class="btn btn-ghost" style="font-size:0.74rem;padding:5px 12px;margin-top:10px;">Detail</a>
+        <div class="result-score-large" onclick="event.stopPropagation()">
+            <div class="score-label">Rating</div>
+            <div class="score-num-large" style="color:var(--accent);">{{ "%.1f"|format(film.rating|float) }}</div>
+            <div style="font-size:0.85rem;color:var(--text-muted);margin:10px 0;">★ IMDb</div>
+            <a href="/detail/{{ film.id }}" class="btn-detail-large">Lihat Detail</a>
         </div>
     </div>
     {% endfor %}
     {% else %}
-    <div style="text-align:center;padding:64px 0;">
-        <div style="font-size:2.8rem;margin-bottom:14px;opacity:.5;">🎭</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text-muted);margin-bottom:8px;">Belum Ada Film</div>
-        <div style="color:var(--text-muted);font-size:0.85rem;">Tidak ada film dengan genre "{{ filter_genre }}" di database</div>
+    <div class="empty-state">
+        <div class="empty-state-icon">🎭</div>
+        <div class="empty-state-title">Belum Ada Film</div>
+        <div class="empty-state-desc">Tidak ada film dengan genre "{{ filter_genre }}" di database</div>
     </div>
     {% endif %}
 
     {% else %}
     {# ── MODE 3: Halaman default — tampilkan contoh query ── #}
-    <div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;">
-        💡 Contoh Query Pencarian
-    </div>
-    <div class="grid-3">
-        {% set contoh = [
-            ('Superhero Aksi',    'film superhero aksi petualangan Marvel DC'),
-            ('Horor Menegangkan', 'film horor seram menegangkan hantu monster'),
-            ('Drama Romantis',    'film drama percintaan romantis cinta mengharukan'),
-            ('Fiksi Ilmiah',      'film fiksi ilmiah luar angkasa teknologi masa depan'),
-            ('Komedi Segar',      'film komedi humor ringan lucu menghibur'),
-            ('Fantasi Sihir',     'film sihir fantasi petualangan penyihir'),
-        ] %}
-        {% for label, q in contoh %}
-        <a href="/cari?q={{ q }}" style="text-decoration:none;">
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;
-                 padding:14px 16px;transition:all .25s;margin-bottom:10px;"
-                 onmouseover="this.style.borderColor='var(--border-strong)'"
-                 onmouseout="this.style.borderColor='var(--border)'">
-                <div style="font-size:0.86rem;font-weight:600;margin-bottom:4px;">{{ label }}</div>
-                <div style="color:var(--text-muted);font-size:0.76rem;font-style:italic;">"{{ q[:55] }}..."</div>
-            </div>
-        </a>
-        {% endfor %}
+    <div class="example-section">
+        <div class="example-label">
+            <span style="font-size:1.2rem;">💡</span>
+            Contoh Query Pencarian
+        </div>
+        <div class="grid-3">
+            {% set contoh = [
+                ('Superhero Aksi',    'film superhero aksi petualangan Marvel DC'),
+                ('Horor Menegangkan', 'film horor seram menegangkan hantu monster'),
+                ('Drama Romantis',    'film drama percintaan romantis cinta mengharukan'),
+                ('Fiksi Ilmiah',      'film fiksi ilmiah luar angkasa teknologi masa depan'),
+                ('Komedi Segar',      'film komedi humor ringan lucu menghibur'),
+                ('Fantasi Sihir',     'film sihir fantasi petualangan penyihir'),
+            ] %}
+            {% for label, q in contoh %}
+            <a href="/cari?q={{ q }}" style="text-decoration:none;">
+                <div class="example-card">
+                    <div class="example-card-title">{{ label }}</div>
+                    <div class="example-card-query">"{{ q[:55] }}..."</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
     </div>
 
     <!-- Genre Browse -->
-    <div style="margin-top:36px;">
-        <div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px;">
-            🎭 Jelajahi Berdasarkan Genre
+    <div class="genre-section">
+        <div class="example-label">
+            <span style="font-size:1.2rem;">🎭</span>
+            Jelajahi Berdasarkan Genre
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <div class="genre-pills">
             {% for g in genres %}
-            <a href="/cari?genre={{ g }}"
-               style="padding:9px 22px;border-radius:26px;font-size:0.82rem;font-weight:600;
-                      background:transparent;color:var(--text-dim);border:1px solid var(--border);
-                      text-decoration:none;transition:all .2s;font-family:'DM Sans',sans-serif;"
-               onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-               onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
-                {{ g }}
-            </a>
+            <a href="/cari?genre={{ g }}" class="genre-pill">{{ g }}</a>
             {% endfor %}
         </div>
     </div>
