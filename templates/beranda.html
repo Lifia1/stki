@@ -235,7 +235,7 @@ body > main + footer { display: none; }
 }
 .fscroll::-webkit-scrollbar { display: none; }
 
-/* ══ FILM CARD — Ukuran Lebih Besar ══ */
+/* ══ FILM CARD ══ */
 .fcard {
     flex: 0 0 220px; scroll-snap-align: start;
     cursor: pointer; text-decoration: none;
@@ -298,7 +298,7 @@ body > main + footer { display: none; }
     border: 1px solid rgba(131,153,88,0.25);
 }
 
-/* ══ FILM CARD — Ukuran XL untuk section Featured ══ */
+/* ══ FILM CARD XL ══ */
 .fcard-xl {
     flex: 0 0 260px; scroll-snap-align: start;
     cursor: pointer; text-decoration: none;
@@ -312,7 +312,7 @@ body > main + footer { display: none; }
 .fcard-xl .fcard-badge { font-size: 0.78rem; padding: 6px 13px; }
 .fcard-xl .fcard-init { font-size: 5rem; }
 
-/* ══ FILM GRID untuk "Semua Film" ══ */
+/* ══ FILM GRID ══ */
 .fgrid-section { margin-top: 48px; border-top: 1px solid var(--border); padding-top: 44px; }
 .fgrid {
     display: grid;
@@ -360,7 +360,7 @@ body > main + footer { display: none; }
 .fgrid-meta .ico { color: var(--rosy-brown); font-size: 0.72rem; }
 .fgrid-meta span { font-size: 0.78rem; color: var(--text-muted); }
 
-/* ══ GENRE SPOTLIGHT SECTION ══ */
+/* ══ GENRE SPOTLIGHT ══ */
 .genre-spotlight {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -456,7 +456,7 @@ body > main + footer { display: none; }
 .qcard-title { font-size: 1.04rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
 .qcard-q { color: var(--text-muted); font-size: 0.86rem; font-style: italic; line-height: 1.65; }
 
-/* ══ TOP RATED BANNER LIST ══ */
+/* ══ TOP RATED LIST ══ */
 .toprated-list { display: flex; flex-direction: column; gap: 14px; }
 .toprated-item {
     display: flex; align-items: center; gap: 18px;
@@ -490,13 +490,34 @@ body > main + footer { display: none; }
     font-size: 1.5rem; font-weight: 700; color: var(--accent);
 }
 
-/* ══ DUAL COLUMN LAYOUT ══ */
+/* ══ DUAL COLUMN ══ */
 .dual-col {
     display: grid; grid-template-columns: 1fr 380px; gap: 36px;
     align-items: start;
 }
 
-/* ══ NF FOOTER ══ */
+/* ══ PAGINATION ══ */
+.pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; margin-top: 36px; flex-wrap: wrap;
+}
+.pag-btn {
+    min-width: 40px; height: 40px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.86rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; font-family: 'DM Sans', sans-serif;
+    padding: 0 12px;
+}
+.pag-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(131,153,88,0.08); }
+.pag-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 700; }
+.pag-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+.pag-info {
+    font-size: 0.8rem; color: var(--text-muted);
+    text-align: center; margin-top: 10px;
+}
+
+/* ══ FOOTER ══ */
 .nf-footer {
     background: var(--surface); border-top: 1px solid var(--border);
     padding: 44px 64px 24px; margin-top: 64px;
@@ -540,6 +561,34 @@ body > main + footer { display: none; }
     font-size: 0.68rem; color: var(--text-muted); text-align: center;
 }
 
+/* ══ SIMILARITY BADGE ══ */
+.sim-badge {
+    position: absolute; top: 9px; left: 10px;
+    background: rgba(9,30,20,0.92);
+    color: #f5c518;
+    font-size: 0.7rem; font-weight: 700;
+    padding: 4px 9px; border-radius: 20px;
+    border: 1px solid rgba(245,197,24,0.35);
+    display: none; /* tersembunyi saat tidak ada filter genre */
+    z-index: 3;
+    transition: opacity .3s;
+}
+.sim-badge.show { display: block; }
+
+/* bar kecil di bawah badge menunjukkan persentase */
+.sim-bar-wrap {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: rgba(255,255,255,0.08);
+    display: none;
+}
+.sim-bar-wrap.show { display: block; }
+.sim-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #839958, #f5c518);
+    width: 0%; transition: width .5s ease;
+}
+
+
 @media (max-width: 1300px) {
     .hero-left { flex: 0 0 50%; }
     .genre-spotlight { grid-template-columns: repeat(3, 1fr); }
@@ -567,10 +616,9 @@ body > main + footer { display: none; }
 {% endblock %}
 
 {% block content %}
-{# Fallback: jika app.py belum mengirim film_semua, gunakan film_populer #}
 {% if film_semua is not defined %}{% set film_semua = film_populer %}{% endif %}
 
-<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<!-- ══ HERO ══ -->
 <div class="hero-section" id="heroSection">
     <div class="hero-left">
         <div class="hero-content" id="heroContent" style="opacity:0;transition:opacity .35s;">
@@ -612,7 +660,7 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ STATS BAR ══════════════════════════════════════════════════ -->
+<!-- ══ STATS BAR ══ -->
 <div class="stats-bar">
     {% for label, val in [('Total Film', total), ('Genre', genres|length), ('Model IR', 2), ('Query Uji', 10)] %}
     <div class="stat-item">
@@ -622,7 +670,7 @@ body > main + footer { display: none; }
     {% endfor %}
 </div>
 
-<!-- ══ TRENDS NOW ════════════════════════════════════════════════ -->
+<!-- ══ TRENDS NOW ══ -->
 <div class="sec" style="padding-top:40px;">
     <div class="sec-head">
         <div class="sec-title">
@@ -634,20 +682,17 @@ body > main + footer { display: none; }
             <span class="sec-tab active" onclick="setTab(this,'trends')">+ Terbaru</span>
         </div>
     </div>
-
     <div class="gpills" id="trendsGenrePills">
         <span class="gpill act-red" data-target="trendsScroll" data-genre="">Semua</span>
         {% for g in genres %}
         <span class="gpill" data-target="trendsScroll" data-genre="{{ g }}">{{ g }}</span>
         {% endfor %}
     </div>
-
     <div class="fscroll-wrap">
         <div class="fscroll" id="trendsScroll">
             {% for film in film_semua %}
             {% set gl = film.genre.split(',') if film.genre else [] %}
-            <a href="/detail/{{ film.id }}" class="fcard"
-               data-genre="{{ film.genre or '' }}">
+            <a href="/detail/{{ film.id }}" class="fcard" data-genre="{{ film.genre or '' }}">
                 <div class="fcard-poster">
                     {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
                     <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
@@ -666,7 +711,7 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ FEATURED / PILIHAN EDITOR (XL Cards) ════════════════════ -->
+<!-- ══ PILIHAN EDITOR ══ -->
 <div class="sec" style="padding-top:44px;">
     <div class="sec-head">
         <div class="sec-title">
@@ -678,8 +723,7 @@ body > main + footer { display: none; }
         <div class="fscroll" id="featuredScroll">
             {% for film in film_semua | sort(attribute='rating', reverse=True) %}
             {% set gl = film.genre.split(',') if film.genre else [] %}
-            <a href="/detail/{{ film.id }}" class="fcard fcard-xl"
-               data-genre="{{ film.genre or '' }}">
+            <a href="/detail/{{ film.id }}" class="fcard fcard-xl" data-genre="{{ film.genre or '' }}">
                 <div class="fcard-poster">
                     {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
                     <div class="fcard-init">{{ film.judul[:2]|upper }}</div>
@@ -698,11 +742,11 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ GENRE SPOTLIGHT ═══════════════════════════════════════════ -->
+<!-- ══ GENRE SPOTLIGHT ══ -->
 <div class="sec" style="padding-top:48px;">
     <div class="sec-head">
         <div class="sec-title">
-            <span>🎭</span> Jelajahi Genre
+            Jelajahi Genre
         </div>
         <a href="/cari" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Semua genre →</a>
     </div>
@@ -721,16 +765,11 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ SEMUA FILM + TOP RATED (Dual Column) ══════════════════════ -->
+<!-- ══ SEMUA FILM + TOP RATED ══ -->
 <div class="sec fgrid-section">
     <div class="sec-head">
         <div class="sec-title">
-            <span>🎬</span> Semua Film
-        </div>
-        <div class="sec-tabs">
-            <span class="sec-tab active">✓ Film Populer</span>
-            <span class="sec-tab">▷ Berdasarkan Genre</span>
-            <a href="/cari" style="font-size:0.8rem;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:5px;padding-bottom:3px;">🔍 Cari Film</a>
+            Semua Film
         </div>
     </div>
 
@@ -768,7 +807,7 @@ body > main + footer { display: none; }
     </div>
 
     <div class="dual-col">
-        <!-- Kiri: Grid Film — semua dari database -->
+        <!-- Kiri: Grid Film -->
         <div>
             <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;" id="gridCount"></div>
             <div class="fgrid" id="moviesGrid">
@@ -783,6 +822,11 @@ body > main + footer { display: none; }
                         {% if film.poster_url %}<img src="{{ film.poster_url }}" alt="{{ film.judul }}" onerror="this.style.display='none'">{% endif %}
                         <div class="fgrid-init">{{ film.judul[:2]|upper }}</div>
                         <div class="fgrid-badge">★ {{ "%.1f"|format(film.rating|float) }}</div>
+                        <!-- TAMBAHKAN INI -->
+                        <div class="sim-badge" id="sim-{{ film.id }}"></div>
+                        <div class="sim-bar-wrap" id="simbar-{{ film.id }}">
+                            <div class="sim-bar-fill" id="simfill-{{ film.id }}"></div>
+                        </div>
                     </div>
                     <div class="fgrid-title" title="{{ film.judul }}">{{ film.judul }}</div>
                     <div class="fgrid-year">{{ film.tahun }}</div>
@@ -793,9 +837,13 @@ body > main + footer { display: none; }
                 </a>
                 {% endfor %}
             </div>
+
+            <!-- PAGINATION -->
+            <div class="pagination" id="moviesPagination"></div>
+            <div class="pag-info" id="pagInfo"></div>
         </div>
 
-        <!-- Kanan: Top Rated Sidebar — 15 teratas -->
+        <!-- Kanan: Top Rated Sidebar -->
         <div>
             <div style="margin-bottom:22px;">
                 <div class="sec-title" style="font-size:1.2rem;margin-bottom:16px;">
@@ -823,7 +871,7 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ COBA QUERY ════════════════════════════════════════════════ -->
+<!-- ══ COBA QUERY ══ -->
 <div class="sec sec-last" style="margin-top:48px;">
     <div class="sec-head">
         <div class="sec-title">
@@ -849,7 +897,7 @@ body > main + footer { display: none; }
     </div>
 </div>
 
-<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<!-- ══ FOOTER ══ -->
 <div class="nf-footer">
     <div class="nf-grid">
         <div class="nf-col">
@@ -945,108 +993,269 @@ document.querySelectorAll('.hero-dot').forEach((d, i) => {
 setHeroSlide(0);
 startHeroAuto();
 
-// ── GENRE PILL FILTER (berlaku untuk trends row DAN movies grid) ──
-// Setiap pill punya data-target (id container) dan data-genre
-function filterByGenre(genre, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const items = container.querySelectorAll('[data-genre]');
-    let count = 0;
-    items.forEach(item => {
-        const itemGenres = (item.dataset.genre || '').toLowerCase();
-        const match = !genre || itemGenres.includes(genre.toLowerCase());
-        item.style.display = match ? '' : 'none';
-        if (match) count++;
+// ── PAGINATION ─────────────────────────────────────────────────
+// Hitung kolom berdasarkan lebar grid (minmax 200px → auto-fill)
+function getColsPerRow() {
+    const grid = document.getElementById('moviesGrid');
+    if (!grid) return 6;
+    const w = grid.offsetWidth;
+    return Math.max(1, Math.floor(w / 220)); // 220px = lebar card + gap estimasi
+}
+
+const ROWS_PER_PAGE = 2;
+
+let currentPage    = 1;
+let filteredCards  = [];
+
+function renderPagination(total, page) {
+    const cols       = getColsPerRow();
+    const pp         = cols * ROWS_PER_PAGE;
+    const totalPages = Math.max(1, Math.ceil(total / pp));
+    const el         = document.getElementById('moviesPagination');
+    const info       = document.getElementById('pagInfo');
+    if (!el) return;
+
+    let html = '';
+
+    // Prev
+    html += `<button class="pag-btn${page <= 1 ? ' disabled' : ''}" onclick="goPage(${page - 1})">‹ Prev</button>`;
+
+    // Nomor halaman dengan ellipsis
+    const range = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) range.push(i);
+    } else {
+        range.push(1);
+        if (page > 3) range.push('...');
+        for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) range.push(i);
+        if (page < totalPages - 2) range.push('...');
+        range.push(totalPages);
+    }
+
+    range.forEach(r => {
+        if (r === '...') {
+            html += `<span class="pag-btn disabled" style="cursor:default;pointer-events:none;">…</span>`;
+        } else {
+            html += `<button class="pag-btn${r === page ? ' active' : ''}" onclick="goPage(${r})">${r}</button>`;
+        }
     });
-    // Update count label khusus grid
-    const countEl = document.getElementById('gridCount');
-    if (countEl && containerId === 'moviesGrid') {
-        countEl.textContent = genre
-            ? `Menampilkan ${count} film genre "${genre}"`
-            : `Menampilkan ${count} film`;
+
+    // Next
+    html += `<button class="pag-btn${page >= totalPages ? ' disabled' : ''}" onclick="goPage(${page + 1})">Next ›</button>`;
+
+    el.innerHTML = html;
+
+    if (info) {
+        const start = (page - 1) * pp + 1;
+        const end   = Math.min(page * pp, total);
+        info.textContent = total > 0
+            ? `Halaman ${page} dari ${totalPages} · Film ${start}–${end} dari ${total}`
+            : 'Tidak ada film yang sesuai filter';
     }
 }
 
+function showPage(page) {
+    currentPage    = page;
+    const cols     = getColsPerRow();
+    const pp       = cols * ROWS_PER_PAGE;
+    const start    = (page - 1) * pp;
+    const end      = start + pp;
+
+    // Sembunyikan semua card di DOM
+    document.querySelectorAll('#moviesGrid .fgrid-card').forEach(c => c.style.display = 'none');
+
+    // Tampilkan hanya slice halaman ini
+    filteredCards.slice(start, end).forEach(c => c.style.display = '');
+
+    renderPagination(filteredCards.length, page);
+}
+
+function goPage(page) {
+    const cols       = getColsPerRow();
+    const pp         = cols * ROWS_PER_PAGE;
+    const totalPages = Math.max(1, Math.ceil(filteredCards.length / pp));
+    if (page < 1 || page > totalPages) return;
+    showPage(page);
+    // Scroll halus ke atas section grid
+    const section = document.querySelector('.fgrid-section');
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function collectFiltered() {
+    const activePill  = document.querySelector('#moviesGenrePills .gpill.act-red');
+    const activeGenre = activePill ? activePill.dataset.genre : '';
+    const minRating   = parseFloat(document.getElementById('ratingSlider').value) || 0;
+    const yearFilter  = document.getElementById('sortYear').value;
+    const azVal       = document.getElementById('sortAZ').value;
+
+    const allCards = Array.from(document.querySelectorAll('#moviesGrid .fgrid-card'));
+
+    let result = allCards.filter(card => {
+        const genres     = (card.dataset.genre || '').toLowerCase();
+        const r          = parseFloat(card.dataset.rating || 0);
+        const y          = card.dataset.year;
+        const matchGenre  = !activeGenre || genres.includes(activeGenre.toLowerCase());
+        const matchRating = minRating === 0 || r >= minRating;
+        const matchYear   = !yearFilter || y === yearFilter;
+        return matchGenre && matchRating && matchYear;
+    });
+
+    // Sort A-Z / Z-A
+    result.sort((a, b) => {
+        const ta = a.dataset.title || '', tb = b.dataset.title || '';
+        return azVal === 'za' ? tb.localeCompare(ta) : ta.localeCompare(tb);
+    });
+
+    return result;
+}
+
+function applyFiltersAndRender() {
+    const activePill  = document.querySelector('#moviesGenrePills .gpill.act-red');
+    const activeGenre = activePill ? activePill.dataset.genre : '';
+    const minRating   = parseFloat(document.getElementById('ratingSlider').value) || 0;
+    const yearFilter  = document.getElementById('sortYear').value;
+
+    filteredCards = collectFiltered();
+
+    // Update label count
+    const countEl = document.getElementById('gridCount');
+    if (countEl) {
+        let desc = `${filteredCards.length} film ditemukan`;
+        if (activeGenre) desc += ` · genre "${activeGenre}"`;
+        if (minRating > 0) desc += ` · rating ≥ ${minRating.toFixed(1)}`;
+        if (yearFilter)   desc += ` · tahun ${yearFilter}`;
+        countEl.textContent = desc;
+    }
+
+    showPage(1);
+}
+
+// ── GENRE PILL FILTER ─────────────────────────────────────────
 document.querySelectorAll('.gpill[data-target]').forEach(pill => {
     pill.addEventListener('click', function () {
         const target = this.dataset.target;
-        const genre  = this.dataset.genre;
-        // Update active state hanya dalam gpills yang sama
         this.closest('.gpills').querySelectorAll('.gpill').forEach(p => p.classList.remove('act-red', 'act-green'));
         this.classList.add('act-red');
-        filterByGenre(genre, target);
-        // Reset sort/rating jika filter grid
+
+        if (target === 'trendsScroll') {
+            // Trends row: filter langsung (bukan pagination)
+            const genre = this.dataset.genre;
+            document.querySelectorAll('#trendsScroll [data-genre]').forEach(item => {
+                const ig = (item.dataset.genre || '').toLowerCase();
+                item.style.display = (!genre || ig.includes(genre.toLowerCase())) ? '' : 'none';
+            });
+            return;
+        }
+
         if (target === 'moviesGrid') {
-            document.getElementById('sortYear').value = '';
-            document.getElementById('ratingSlider').value = 0;
+            document.getElementById('sortYear').value        = '';
+            document.getElementById('ratingSlider').value    = 0;
             document.getElementById('ratingVal').textContent = 'Semua';
+
+            const genre = this.dataset.genre;
+            if (genre) {
+                fetchGenreSimilarity(genre);
+            } else {
+                clearSimBadges();   // pill "Semua" → hapus semua badge
+            }
+
+            applyFiltersAndRender();
         }
     });
 });
-
-// Init count
-const allCards = document.querySelectorAll('#moviesGrid .fgrid-card');
-const countEl = document.getElementById('gridCount');
-if (countEl) countEl.textContent = `Menampilkan ${allCards.length} film`;
 
 // ── RATING SLIDER ─────────────────────────────────────────────
 function updateRating(el) {
     const v = parseFloat(el.value);
     document.getElementById('ratingVal').textContent = v > 0 ? v.toFixed(1) + '+' : 'Semua';
-    // Ambil genre aktif saat ini
-    const activePill = document.querySelector('#moviesGenrePills .gpill.act-red');
-    const activeGenre = activePill ? activePill.dataset.genre : '';
-    let count = 0;
-    document.querySelectorAll('#moviesGrid .fgrid-card').forEach(card => {
-        const r = parseFloat(card.dataset.rating || 0);
-        const genres = (card.dataset.genre || '').toLowerCase();
-        const matchGenre = !activeGenre || genres.includes(activeGenre.toLowerCase());
-        const matchRating = v === 0 || r >= v;
-        card.style.display = (matchGenre && matchRating) ? '' : 'none';
-        if (matchGenre && matchRating) count++;
-    });
-    const countEl = document.getElementById('gridCount');
-    if (countEl) countEl.textContent = `Menampilkan ${count} film` + (activeGenre ? ` genre "${activeGenre}"` : '') + (v > 0 ? ` rating ≥ ${v.toFixed(1)}` : '');
+    applyFiltersAndRender();
 }
 
 // ── SORT MOVIES ───────────────────────────────────────────────
 function applySortMovies() {
-    const yearFilter = document.getElementById('sortYear').value;
-    const azVal = document.getElementById('sortAZ').value;
-    const activePill = document.querySelector('#moviesGenrePills .gpill.act-red');
-    const activeGenre = activePill ? activePill.dataset.genre : '';
-    const minRating = parseFloat(document.getElementById('ratingSlider').value) || 0;
-    const container = document.getElementById('moviesGrid');
-    const cards = Array.from(container.querySelectorAll('.fgrid-card'));
-
-    let count = 0;
-    cards.forEach(c => {
-        const y = c.dataset.year;
-        const r = parseFloat(c.dataset.rating || 0);
-        const genres = (c.dataset.genre || '').toLowerCase();
-        const matchYear   = !yearFilter || y === yearFilter;
-        const matchRating = minRating === 0 || r >= minRating;
-        const matchGenre  = !activeGenre || genres.includes(activeGenre.toLowerCase());
-        const show = matchYear && matchRating && matchGenre;
-        c.style.display = show ? '' : 'none';
-        if (show) count++;
-    });
-
-    const visible = cards.filter(c => c.style.display !== 'none');
-    visible.sort((a, b) => {
-        const ta = a.dataset.title || '', tb = b.dataset.title || '';
-        return azVal === 'za' ? tb.localeCompare(ta) : ta.localeCompare(tb);
-    });
-    visible.forEach(c => container.appendChild(c));
-
-    const countEl = document.getElementById('gridCount');
-    if (countEl) countEl.textContent = `Menampilkan ${count} film`;
+    applyFiltersAndRender();
 }
 
+// ── TAB ───────────────────────────────────────────────────────
 function setTab(el, group) {
     el.closest('.sec-tabs').querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
 }
+
+// ── GENRE SIMILARITY BADGES ──────────────────────────────────
+function clearSimBadges() {
+    document.querySelectorAll('.sim-badge').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('show');
+    });
+    document.querySelectorAll('.sim-bar-wrap').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.sim-bar-fill').forEach(el => el.style.width = '0%');
+}
+
+function fetchGenreSimilarity(genre) {
+    // Tampilkan loading ringan
+    document.querySelectorAll('.sim-badge').forEach(el => {
+        el.textContent = '...';
+        el.classList.add('show');
+    });
+
+    fetch(`/api/genre-similarity?genre=${encodeURIComponent(genre)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.error || !data.hasil) { clearSimBadges(); return; }
+
+            const scores = data.hasil;  // { film_id: skor }
+
+            // Temukan skor maks untuk normalisasi bar
+            const vals  = Object.values(scores);
+            const maxS  = vals.length ? Math.max(...vals) : 1;
+
+            document.querySelectorAll('#moviesGrid .fgrid-card').forEach(card => {
+                const id    = parseInt(card.getAttribute('href').split('/').pop());
+                const skor  = scores[id];
+                const badge = document.getElementById('sim-' + id);
+                const bar   = document.getElementById('simbar-' + id);
+                const fill  = document.getElementById('simfill-' + id);
+
+                if (badge) {
+                    if (skor && skor > 0) {
+                        badge.textContent = '≈ ' + skor.toFixed(3);
+                        badge.classList.add('show');
+                        // Warna sesuai tingkat relevansi
+                        if (skor >= maxS * 0.7)      badge.style.color = '#6bff6b';
+                        else if (skor >= maxS * 0.4) badge.style.color = '#f5c518';
+                        else                          badge.style.color = '#D3968C';
+                    } else {
+                        badge.textContent = '≈ 0.000';
+                        badge.classList.add('show');
+                        badge.style.color = 'rgba(247,244,213,0.3)';
+                    }
+                }
+                if (bar && fill) {
+                    bar.classList.add('show');
+                    fill.style.width = skor ? ((skor / maxS) * 100).toFixed(1) + '%' : '0%';
+                }
+            });
+        })
+        .catch(() => clearSimBadges());
+}
+
+
+// ── INIT ──────────────────────────────────────────────────────
+// Tunggu layout selesai agar getColsPerRow() akurat
+window.addEventListener('DOMContentLoaded', () => {
+    applyFiltersAndRender();
+});
+
+// Recalculate saat resize agar jumlah film per halaman menyesuaikan
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        showPage(currentPage);
+        renderPagination(filteredCards.length, currentPage);
+    }, 200);
+});
 </script>
 
 {% endblock %}

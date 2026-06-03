@@ -90,12 +90,15 @@ class SearchEngine:
         return [(self.films[i], s) for i, s in scores[:top_k]]
 
     def similar(self, film: Dict, n: int = 6) -> List[Tuple[Dict, float]]:
-        """Cari film serupa berdasarkan judul + genre + penggalan sinopsis."""
-        q    = f"{film.get('judul','')} {film.get('genre','')} {(film.get('sinopsis','') or '')[:150]}"
-        hits = self.search(q, n + 1)
+        judul    = film.get('judul', '')
+        genre    = film.get('genre', '')
+        sinopsis = (film.get('sinopsis', '') or '')[:300]   
+        pemain   = (film.get('pemain', '') or '')[:100]
+        sutradara = film.get('sutradara', '') or ''
+        
+        q = f"{judul} {judul} {genre} {genre} {sinopsis} {pemain} {sutradara}"
+        hits = self.search(q, top_k=n + 10)
         return [(f, s) for f, s in hits if f["id"] != film["id"]][:n]
-
-
 # ── loader ────────────────────────────────────────────────────────────────────
 
 def load_films_csv(path: Path) -> List[Dict]:

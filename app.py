@@ -165,7 +165,7 @@ def detail(film_id):
         return render_template("404.html"), 404
 
     film_data  = enrich_with_poster(film)
-    serupa_raw = ENGINE.similar(film, n=7)
+    serupa_raw = ENGINE.similar(film, n=20)
     serupa     = []
     for f, s in serupa_raw:
         row = enrich_with_poster(f)
@@ -211,6 +211,20 @@ def api_cari():
     except Exception as e:
         return jsonify({"hasil": [], "jumlah": 0, "error": str(e)})
 
+
+@app.route("/api/genre-similarity")
+def api_genre_similarity():
+    genre = request.args.get("genre", "").strip()
+    if not genre:
+        return jsonify({"hasil": [], "error": "Genre kosong"})
+    try:
+        hits = ENGINE.search(genre, top_k=len(FILMS))
+        hasil = {}
+        for film, skor in hits:
+            hasil[film["id"]] = round(float(skor), 4)
+        return jsonify({"hasil": hasil, "error": None})
+    except Exception as e:
+        return jsonify({"hasil": {}, "error": str(e)})
 
 # ============================================================
 # RUN
