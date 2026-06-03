@@ -11,102 +11,200 @@ body > main + footer { display: none; }
 /* ══ HERO ══════════════════════════════════════════ */
 .hero-section {
     position: relative;
-    height: 520px;
+    /* Isi penuh viewport dikurangi navbar ~52px */
+    height: calc(100vh - 52px);
+    min-height: 500px;
+    max-height: 780px;
     overflow: hidden;
     background: var(--bg);
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
 }
-/* full-bleed background poster */
-.hero-bg-img {
-    position: absolute; inset: 0; z-index: 0;
+
+/* Kiri: area teks info */
+.hero-left {
+    flex: 0 0 42%;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(32px, 4.5vw, 68px);
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(to right, var(--bg) 58%, transparent 100%);
+}
+
+/* Kanan: area poster */
+.hero-right {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 1.8vw, 26px);
+    padding: 28px clamp(28px, 4vw, 60px) 28px 0;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+/* Fade seamless kiri */
+.hero-right::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 70px;
+    background: linear-gradient(to right, var(--bg), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Poster utama — tinggi 86% hero */
+.hero-poster-main {
+    flex-shrink: 0;
+    height: calc((100vh - 52px) * 0.86);
+    min-height: 360px;
+    max-height: 640px;
+    width: calc(((100vh - 52px) * 0.86) * 0.67);
+    min-width: 242px;
+    max-width: 430px;
+    border-radius: clamp(10px, 1.2vw, 16px);
+    overflow: hidden;
+    border: 2px solid rgba(131,153,88,0.5);
+    box-shadow: 0 24px 72px rgba(0,0,0,0.72), 0 0 0 1px rgba(131,153,88,0.12);
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    transition: box-shadow .3s, transform .3s;
+}
+.hero-poster-main:hover {
+    box-shadow: 0 28px 88px rgba(0,0,0,0.85), 0 0 0 2px rgba(131,153,88,0.38);
+    transform: translateY(-3px);
+}
+.hero-poster-main img {
     width: 100%; height: 100%; object-fit: cover;
-    object-position: center top;
-    transition: opacity .5s ease;
+    transition: opacity .4s ease, transform .5s ease;
 }
-.hero-bg-img.fade-out { opacity: 0; }
-/* gradient overlay di atas foto */
-.hero-backdrop {
-    position: absolute; inset: 0; z-index: 1;
-    background:
-        linear-gradient(to right, rgba(9,30,20,0.97) 30%, rgba(9,30,20,0.7) 55%, rgba(9,30,20,0.25) 100%),
-        linear-gradient(to top,   rgba(9,30,20,1)    0%,  transparent       40%);
+.hero-poster-main:hover img { transform: scale(1.04); }
+.hero-poster-main img.fade-out { opacity: 0; transform: scale(0.97); }
+
+/* Thumbnail — sejajar tinggi poster utama, lebih lebar */
+.hero-poster-previews {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.1vw, 16px);
+    z-index: 1;
+    height: calc((100vh - 52px) * 0.86);
+    min-height: 360px;
+    max-height: 640px;
+    justify-content: space-between;
 }
+.hero-poster-thumb {
+    flex: 1;
+    width: clamp(100px, 11vw, 170px);
+    border-radius: clamp(7px, 0.8vw, 12px);
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    opacity: 0.42;
+    transition: all .28s cubic-bezier(.25,.8,.25,1);
+    background: var(--surface);
+    min-height: 0;
+}
+.hero-poster-thumb:hover,
+.hero-poster-thumb.active {
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.55);
+    transform: translateX(-5px);
+}
+.hero-poster-thumb.active { border-width: 2px; }
+.hero-poster-thumb img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+/* Konten teks kiri */
 .hero-content {
-    position: relative; z-index: 3;
-    padding: 0 56px 48px;
-    max-width: 520px;
+    transition: opacity .35s;
+    width: 100%;
 }
 .hero-meta-tag {
-    font-size: 0.68rem; letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 8px;
+    font-size: clamp(0.62rem, 0.75vw, 0.74rem);
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 10px;
 }
 .hero-rating-row {
     display: flex; align-items: center; gap: 10px;
-    font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;
+    font-size: clamp(0.85rem, 1vw, 1rem);
+    color: var(--text-muted); margin-bottom: 14px;
 }
-.hero-rating-row .hstar { color: #f5c518; font-size: 0.9rem; }
-.hero-rating-row strong { color: var(--beige); font-size: 1rem; font-weight: 700; }
+.hero-rating-row .hstar { color: #f5c518; font-size: clamp(0.9rem, 1.1vw, 1.1rem); }
+.hero-rating-row strong {
+    color: var(--beige);
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    font-weight: 700;
+}
 .hero-title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-size: clamp(2rem, 3.5vw, 4rem);
     font-weight: 700; color: #fff;
     letter-spacing: 1px; line-height: 1.08;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 .hero-desc {
-    font-size: 0.84rem; color: var(--text-muted);
-    line-height: 1.7; margin-bottom: 24px;
-    max-width: 400px;
+    font-size: clamp(0.88rem, 1.05vw, 1rem);
+    color: var(--text-muted);
+    line-height: 1.75; margin-bottom: 28px;
+    max-width: 420px;
 }
-.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
 .btn-watch-hero {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: center; gap: 9px;
     background: #e50914; color: #fff; border: none;
-    padding: 12px 28px; border-radius: 5px;
+    padding: clamp(12px,1.2vw,15px) clamp(24px,2.4vw,34px);
+    border-radius: 6px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.86rem; font-weight: 700;
+    font-size: clamp(0.86rem, 1vw, 1rem); font-weight: 700;
     cursor: pointer; letter-spacing: 0.5px;
-    text-decoration: none; transition: background .2s;
+    text-decoration: none; transition: background .2s, transform .15s;
 }
-.btn-watch-hero:hover { background: #c1070f; }
+.btn-watch-hero:hover { background: #c1070f; transform: translateY(-2px); }
 .btn-addlist-hero {
-    display: inline-flex; align-items: center; gap: 8px;
+    display: inline-flex; align-items: center; gap: 9px;
     background: rgba(131,153,88,0.1); color: var(--accent);
-    border: 1.5px solid var(--accent); padding: 12px 22px;
-    border-radius: 5px; font-family: 'DM Sans', sans-serif;
-    font-size: 0.86rem; font-weight: 600; cursor: pointer;
-    text-decoration: none; transition: all .2s;
+    border: 1.5px solid var(--accent);
+    padding: clamp(12px,1.2vw,15px) clamp(20px,2vw,28px);
+    border-radius: 6px; font-family: 'DM Sans', sans-serif;
+    font-size: clamp(0.86rem, 1vw, 1rem); font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    transition: all .2s;
 }
-.btn-addlist-hero:hover { background: rgba(131,153,88,0.2); }
+.btn-addlist-hero:hover { background: rgba(131,153,88,0.22); transform: translateY(-2px); }
 .hero-dots {
-    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+    position: absolute; bottom: 20px; left: clamp(32px, 5vw, 72px);
     display: flex; gap: 8px; z-index: 5;
 }
 .hero-dot {
-    width: 26px; height: 3px; border-radius: 2px;
-    background: rgba(247,244,213,0.2); cursor: pointer;
-    transition: background .3s;
+    width: 28px; height: 3px; border-radius: 2px;
+    background: rgba(247,244,213,0.18); cursor: pointer;
+    transition: background .3s, width .3s;
 }
-.hero-dot.active { background: var(--accent); }
+.hero-dot.active { background: var(--accent); width: 44px; }
 
 /* ══ SECTION WRAPPER ══ */
-.sec { padding: 28px 48px 0; }
-.sec-last { padding-bottom: 40px; }
+.sec { padding: 36px 56px 0; }
+.sec-last { padding-bottom: 48px; }
 
 /* ══ SECTION HEAD ══ */
 .sec-head {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 .sec-title {
     display: flex; align-items: center; gap: 10px;
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem; font-weight: 700; color: var(--beige);
+    font-size: 1.4rem; font-weight: 700; color: var(--beige);
 }
-.sec-tabs { display: flex; gap: 22px; }
+.sec-tabs { display: flex; gap: 26px; }
 .sec-tab {
-    font-size: 0.78rem; color: var(--text-muted);
+    font-size: 0.84rem; color: var(--text-muted);
     cursor: pointer; display: flex; align-items: center; gap: 5px;
     padding-bottom: 3px; border-bottom: 2px solid transparent;
     transition: all .2s; user-select: none;
@@ -116,14 +214,14 @@ body > main + footer { display: none; }
 
 /* ══ GENRE PILLS ══ */
 .gpills {
-    display: flex; gap: 9px; margin-bottom: 20px;
+    display: flex; gap: 10px; margin-bottom: 22px;
     overflow-x: auto; scrollbar-width: none;
     padding-bottom: 2px;
 }
 .gpills::-webkit-scrollbar { display: none; }
 .gpill {
-    flex-shrink: 0; padding: 6px 18px; border-radius: 22px;
-    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.3px;
+    flex-shrink: 0; padding: 7px 20px; border-radius: 24px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;
     background: transparent; color: var(--text-dim);
     border: 1px solid var(--border); cursor: pointer;
     transition: all .2s; white-space: nowrap;
@@ -137,28 +235,28 @@ body > main + footer { display: none; }
 /* ══ FILM SCROLL ROW ══ */
 .fscroll-wrap { position: relative; }
 .fscroll {
-    display: flex; gap: 14px; overflow-x: auto;
-    padding-bottom: 8px; scroll-snap-type: x mandatory;
+    display: flex; gap: 18px; overflow-x: auto;
+    padding-bottom: 10px; scroll-snap-type: x mandatory;
     scrollbar-width: none;
 }
 .fscroll::-webkit-scrollbar { display: none; }
 
 /* ══ FILM CARD ══ */
 .fcard {
-    flex: 0 0 165px; scroll-snap-align: start;
+    flex: 0 0 200px; scroll-snap-align: start;
     cursor: pointer; text-decoration: none;
     transition: transform .25s;
 }
-.fcard:hover { transform: translateY(-4px); }
+.fcard:hover { transform: translateY(-5px); }
 .fcard-poster {
-    width: 165px; height: 240px; border-radius: 9px;
+    width: 200px; height: 290px; border-radius: 10px;
     background: var(--surface); border: 1px solid var(--border);
     overflow: hidden; position: relative;
     transition: border-color .25s, box-shadow .25s;
 }
 .fcard:hover .fcard-poster {
     border-color: var(--border-strong);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.55);
 }
 .fcard-poster img {
     width: 100%; height: 100%; object-fit: cover;
@@ -169,100 +267,101 @@ body > main + footer { display: none; }
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Playfair Display', serif;
-    font-size: 3rem; color: rgba(247,244,213,0.1);
+    font-size: 3.5rem; color: rgba(247,244,213,0.1);
     pointer-events: none;
 }
 .fcard-badge {
-    position: absolute; bottom: 7px; right: 8px;
+    position: absolute; bottom: 8px; right: 9px;
     background: rgba(9,30,20,0.88); color: var(--accent);
-    font-size: 0.65rem; font-weight: 700;
-    padding: 3px 8px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
     border: 1px solid rgba(131,153,88,0.3);
 }
 .fcard-title {
-    font-size: 0.82rem; font-weight: 600; color: var(--text);
-    margin-top: 9px; line-height: 1.35;
+    font-size: 0.92rem; font-weight: 600; color: var(--text);
+    margin-top: 10px; line-height: 1.35;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    max-width: 165px;
+    max-width: 200px;
 }
-.fcard-year { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+.fcard-year { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
 .fcard-meta {
-    display: flex; align-items: center; gap: 5px; margin-top: 4px;
+    display: flex; align-items: center; gap: 5px; margin-top: 5px;
 }
-.fcard-meta .ico { color: var(--rosy-brown); font-size: 0.68rem; }
-.fcard-meta span { font-size: 0.72rem; color: var(--text-muted); }
+.fcard-meta .ico { color: var(--rosy-brown); font-size: 0.72rem; }
+.fcard-meta span { font-size: 0.78rem; color: var(--text-muted); }
 
 /* ══ MOVIES DIVIDER SECTION ══ */
 .movies-section {
-    margin-top: 36px;
+    margin-top: 44px;
     border-top: 1px solid var(--border);
-    padding-top: 28px;
+    padding-top: 36px;
 }
 
 /* ══ SORT BAR ══ */
 .sort-bar {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
-.sort-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.sort-lbl { font-size: 0.74rem; color: var(--text-muted); }
+.sort-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sort-lbl { font-size: 0.82rem; color: var(--text-muted); }
 .sort-active {
-    padding: 6px 16px; border-radius: 22px;
-    font-size: 0.73rem; font-weight: 700;
+    padding: 8px 20px; border-radius: 24px;
+    font-size: 0.8rem; font-weight: 700;
     background: var(--accent); color: var(--bg); border: none; cursor: pointer;
     font-family: 'DM Sans', sans-serif;
 }
 .sort-sel {
-    padding: 6px 14px; border-radius: 22px; font-size: 0.73rem;
+    padding: 7px 16px; border-radius: 24px; font-size: 0.8rem;
     background: transparent; color: var(--text-dim);
     border: 1px solid var(--border); outline: none; cursor: pointer;
     font-family: 'DM Sans', sans-serif;
     transition: border-color .2s;
 }
 .sort-sel:hover { border-color: var(--accent); }
-.rating-right { display: flex; align-items: center; gap: 8px; }
-.rating-right .rstar { color: #f5c518; font-size: 0.9rem; }
+.rating-right { display: flex; align-items: center; gap: 10px; }
+.rating-right .rstar { color: #f5c518; font-size: 1rem; }
 .rslider {
-    -webkit-appearance: none; width: 100px; height: 3px;
+    -webkit-appearance: none; width: 120px; height: 3px;
     background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
 }
 .rslider::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 13px; height: 13px;
+    -webkit-appearance: none; width: 15px; height: 15px;
     border-radius: 50%; background: var(--accent); cursor: pointer;
 }
-.rval { font-size: 0.74rem; color: var(--text-muted); min-width: 28px; }
+.rval { font-size: 0.8rem; color: var(--text-muted); min-width: 36px; }
 
 /* ══ SCROLL WITH ARROWS ══ */
 .arrow-wrap {
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 14px;
 }
 .sarrow {
-    flex-shrink: 0; width: 32px; height: 130px;
+    flex-shrink: 0; width: 36px; height: 150px;
     background: rgba(131,153,88,0.07); border: 1px solid var(--border);
-    border-radius: 6px; display: flex; align-items: center; justify-content: center;
-    color: var(--accent); cursor: pointer; font-size: 1.2rem;
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: var(--accent); cursor: pointer; font-size: 1.4rem;
     transition: all .2s; user-select: none; align-self: center;
 }
 .sarrow:hover { background: rgba(131,153,88,0.18); border-color: var(--border-strong); }
 
 /* ══ QUERY CARDS ══ */
 .qgrid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    margin-top: 22px;
 }
 .qcard {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 11px; padding: 18px 20px;
+    border-radius: 13px; padding: 22px 26px;
     text-decoration: none; display: block;
     transition: all .25s; cursor: pointer;
 }
 .qcard:hover {
     border-color: var(--border-strong);
     background: var(--surface2);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.3);
 }
-.qcard-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-.qcard-q { color: var(--text-muted); font-size: 0.78rem; font-style: italic; line-height: 1.5; }
+.qcard-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.qcard-q { color: var(--text-muted); font-size: 0.84rem; font-style: italic; line-height: 1.6; }
 
 /* ══ STATS BAR ══ */
 .stats-bar {
@@ -271,61 +370,107 @@ body > main + footer { display: none; }
     display: flex; justify-content: center;
 }
 .stat-item {
-    flex: 1; max-width: 200px; text-align: center;
-    padding: 20px 16px; border-right: 1px solid var(--border);
+    flex: 1; max-width: 240px; text-align: center;
+    padding: 28px 20px; border-right: 1px solid var(--border);
 }
 .stat-item:last-child { border-right: none; }
 .stat-val {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem; font-weight: 700; color: var(--accent);
+    font-size: 2.5rem; font-weight: 700; color: var(--accent);
 }
 .stat-lbl {
-    font-size: 0.68rem; color: var(--text-muted);
-    letter-spacing: 1.2px; text-transform: uppercase; margin-top: 3px;
+    font-size: 0.74rem; color: var(--text-muted);
+    letter-spacing: 1.4px; text-transform: uppercase; margin-top: 5px;
 }
 
 /* ══ NF FOOTER ══ */
 .nf-footer {
     background: var(--surface); border-top: 1px solid var(--border);
-    padding: 32px 48px 18px; margin-top: 48px;
+    padding: 36px 56px 22px; margin-top: 56px;
 }
 .nf-grid {
     display: grid; grid-template-columns: repeat(4, 1fr) 1.8fr;
-    gap: 28px; margin-bottom: 24px;
+    gap: 32px; margin-bottom: 28px;
 }
 .nf-col h4 {
-    font-size: 0.8rem; font-weight: 700; color: var(--accent);
-    margin-bottom: 12px; letter-spacing: 0.5px;
+    font-size: 0.86rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 14px; letter-spacing: 0.5px;
 }
 .nf-col a, .nf-col p {
-    display: block; font-size: 0.72rem; color: var(--text-muted);
-    line-height: 2.1; text-decoration: none; transition: color .2s;
+    display: block; font-size: 0.78rem; color: var(--text-muted);
+    line-height: 2.2; text-decoration: none; transition: color .2s;
 }
 .nf-col a:hover { color: var(--accent); }
 .nf-news {
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 9px; padding: 16px;
+    border-radius: 10px; padding: 20px;
 }
-.nf-news strong { display: block; font-size: 0.84rem; color: var(--beige); margin-bottom: 5px; }
-.nf-news p { font-size: 0.72rem; color: var(--text-muted); line-height: 1.65; }
-.nf-form { display: flex; gap: 7px; margin-top: 12px; }
+.nf-news strong { display: block; font-size: 0.9rem; color: var(--beige); margin-bottom: 7px; }
+.nf-news p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.7; }
+.nf-form { display: flex; gap: 8px; margin-top: 14px; }
 .nf-form input {
     flex: 1; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 5px; padding: 8px 12px; color: var(--text);
-    font-size: 0.72rem; outline: none; font-family: 'DM Sans', sans-serif;
+    border-radius: 6px; padding: 10px 14px; color: var(--text);
+    font-size: 0.78rem; outline: none; font-family: 'DM Sans', sans-serif;
     transition: border-color .2s;
 }
 .nf-form input:focus { border-color: var(--accent); }
 .nf-form button {
     background: var(--accent); color: var(--bg); border: none;
-    border-radius: 5px; padding: 8px 16px;
-    font-size: 0.72rem; font-weight: 700; cursor: pointer;
+    border-radius: 6px; padding: 10px 18px;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
     font-family: 'DM Sans', sans-serif; transition: background .2s;
 }
 .nf-form button:hover { background: #6e8245; }
 .nf-copy {
     border-top: 1px solid var(--border); padding-top: 16px;
     font-size: 0.67rem; color: var(--text-muted); text-align: center;
+}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 1200px) {
+    .hero-left { flex: 0 0 50%; }
+    .hero-poster-thumb { width: clamp(72px, 7.5vw, 110px); }
+}
+@media (max-width: 960px) {
+    .hero-left { flex: 0 0 56%; }
+    .hero-poster-previews { display: none; }
+    .hero-poster-main {
+        height: calc((100vh - 52px) * 0.78);
+        width: calc(((100vh - 52px) * 0.78) * 0.67);
+    }
+}
+@media (max-width: 720px) {
+    .hero-section {
+        height: auto;
+        min-height: unset;
+        max-height: unset;
+        flex-direction: column;
+        padding-bottom: 48px;
+    }
+    .hero-left {
+        flex: none;
+        padding: 40px 28px 24px;
+        background: var(--bg);
+    }
+    .hero-right {
+        flex: none;
+        justify-content: center;
+        padding: 0 28px 20px;
+        background: var(--bg);
+    }
+    .hero-right::before { display: none; }
+    .hero-poster-main {
+        height: 52vw;
+        width: calc(52vw * 0.67);
+        min-height: 200px;
+        min-width: 134px;
+        max-height: 320px;
+        max-width: 214px;
+    }
+    .hero-poster-previews { display: none; }
+    .hero-dots { left: 28px; bottom: 12px; }
+    .hero-title { font-size: clamp(1.7rem, 6vw, 2.4rem); }
 }
 
 /* ══ HOVER TOOLTIP GENRE ══ */
@@ -350,27 +495,44 @@ body > main + footer { display: none; }
 
 <!-- ══ HERO ══════════════════════════════════════════════════════ -->
 <div class="hero-section" id="heroSection">
-    <!-- poster full-bleed, diganti JS -->
-    <img id="heroBgImg" class="hero-bg-img" src="" alt="" style="opacity:0;">
-    <div class="hero-backdrop"></div>
 
-    <!-- Hero content — akan di-update JS saat slide berganti -->
-    <div class="hero-content" id="heroContent" style="opacity:0;transition:opacity .35s;">
-        <div class="hero-meta-tag" id="heroMeta"></div>
-        <div class="hero-rating-row">
-            <span class="hstar">★</span>
-            <strong id="heroRating"></strong>
-            <span>·</span>
-            <span id="heroYear2"></span>
-        </div>
-        <div class="hero-title" id="heroTitle"></div>
-        <div class="hero-desc" id="heroDesc"></div>
-        <div class="hero-btns">
-            <a href="#" class="btn-watch-hero" id="heroLinkWatch">▶ TONTON</a>
-            <a href="#" class="btn-addlist-hero" id="heroLinkSimilar">+ CARI SERUPA</a>
+    <!-- Kiri: info film + tombol -->
+    <div class="hero-left">
+        <div class="hero-content" id="heroContent" style="opacity:0;transition:opacity .35s;">
+            <div class="hero-meta-tag" id="heroMeta"></div>
+            <div class="hero-rating-row">
+                <span class="hstar">★</span>
+                <strong id="heroRating"></strong>
+                <span>·</span>
+                <span id="heroYear2"></span>
+            </div>
+            <div class="hero-title" id="heroTitle"></div>
+            <div class="hero-desc" id="heroDesc"></div>
+            <div class="hero-btns">
+                <a href="#" class="btn-watch-hero" id="heroLinkWatch">▶ TONTON</a>
+                <a href="#" class="btn-addlist-hero" id="heroLinkSimilar">+ CARI SERUPA</a>
+            </div>
         </div>
     </div>
 
+    <!-- Kanan: poster utama + thumbnail preview -->
+    <div class="hero-right">
+        <div class="hero-poster-main" id="heroPosterMain">
+            <img id="heroBgImg" src="" alt="">
+        </div>
+        <div class="hero-poster-previews" id="heroPosterPreviews">
+            {% for film in film_populer[:4] %}
+            <div class="hero-poster-thumb {% if loop.first %}active{% endif %}"
+                 onclick="setHeroSlide({{ loop.index0 }})"
+                 id="heroThumb{{ loop.index0 }}">
+                <img src="{{ film.poster_url or '' }}" alt="{{ film.judul }}"
+                     onerror="this.parentElement.style.display='none'">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Dots navigasi -->
     <div class="hero-dots" id="heroDots">
         {% for film in film_populer[:4] %}
         <div class="hero-dot {% if loop.first %}active{% endif %}"
@@ -487,7 +649,7 @@ body > main + footer { display: none; }
         <div class="fscroll" id="moviesScroll" style="flex:1;">
             {% for film in film_populer %}
             {% set gl = film.genre.split(',') if film.genre else [] %}
-            <a href="/detail/{{ film.id }}" class="fcard" 
+            <a href="/detail/{{ film.id }}" class="fcard"
                data-title="{{ film.judul }}"
                data-year="{{ film.tahun }}"
                data-rating="{{ film.rating|float }}">
@@ -608,27 +770,26 @@ function setHeroSlide(idx) {
     const f = FILMS_DATA[idx];
     const genres = f.genre ? f.genre.split(',') : [];
 
-    // Swap background poster dengan crossfade
+    // Swap poster kanan dengan fade
     const bgImg = document.getElementById('heroBgImg');
     if (f.poster_url) {
-        // Buat img baru dulu, kalau load sukses baru swap
         const tmp = new Image();
         tmp.onload = function() {
-            bgImg.style.opacity = '0';
+            bgImg.classList.add('fade-out');
             setTimeout(() => {
                 bgImg.src = f.poster_url;
-                bgImg.style.opacity = '1';
+                bgImg.classList.remove('fade-out');
             }, 200);
         };
         tmp.onerror = function() {
-            bgImg.style.opacity = '0';
+            bgImg.src = '';
         };
         tmp.src = f.poster_url;
     } else {
-        bgImg.style.opacity = '0';
+        bgImg.src = '';
     }
 
-    // Update teks konten hero
+    // Update teks kiri
     document.getElementById('heroMeta').textContent =
         (genres[0] ? genres[0].trim() : 'Film') + '  ·  ' + (f.tahun || '');
     document.getElementById('heroRating').textContent =
@@ -645,7 +806,12 @@ function setHeroSlide(idx) {
         d.classList.toggle('active', i === idx);
     });
 
-    // Fade in hero content
+    // Update thumbnail aktif
+    document.querySelectorAll('.hero-poster-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+    });
+
+    // Fade in konten kiri
     const hc = document.getElementById('heroContent');
     hc.style.opacity = '0';
     setTimeout(() => { hc.style.opacity = '1'; }, 250);
@@ -653,11 +819,12 @@ function setHeroSlide(idx) {
 
 function startHeroAuto() {
     heroTimer = setInterval(() => {
-        const next = (heroIdx + 1) % Math.min(FILMS_DATA.length, 6);
+        const next = (heroIdx + 1) % Math.min(FILMS_DATA.length, 4);
         setHeroSlide(next);
     }, 5000);
 }
 
+// Klik dots juga reset timer
 document.querySelectorAll('.hero-dot').forEach((d, i) => {
     d.addEventListener('click', () => {
         clearInterval(heroTimer);
@@ -665,7 +832,8 @@ document.querySelectorAll('.hero-dot').forEach((d, i) => {
         startHeroAuto();
     });
 });
-// Init langsung set slide 0
+
+// Init slide pertama
 setHeroSlide(0);
 startHeroAuto();
 
@@ -719,7 +887,6 @@ function setTab(el, group) {
 // ── GENRE PILL ACTIVE TOGGLE ──────────────────────────────────────
 document.querySelectorAll('.gpill').forEach(pill => {
     pill.addEventListener('click', function(e) {
-        // jangan prevent default — biarkan navigate, tapi highlight dulu
         const parent = this.closest('.gpills');
         if (parent) {
             parent.querySelectorAll('.gpill').forEach(p => {
